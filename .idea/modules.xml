@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/skyln-1024-shop.iml" filepath="$PROJECT_DIR$/.idea/skyln-1024-shop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/skyln-api-gateway/skyln-api-gateway.iml" filepath="$PROJECT_DIR$/skyln-api-gateway/skyln-api-gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/skyln-common/skyln-common.iml" filepath="$PROJECT_DIR$/skyln-common/skyln-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/skyln-coupon-service/skyln-coupon-service.iml" filepath="$PROJECT_DIR$/skyln-coupon-service/skyln-coupon-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/skyln-order-service/skyln-order-service.iml" filepath="$PROJECT_DIR$/skyln-order-service/skyln-order-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/skyln-product-service/skyln-product-service.iml" filepath="$PROJECT_DIR$/skyln-product-service/skyln-product-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/skyln-user-service/skyln-user-service.iml" filepath="$PROJECT_DIR$/skyln-user-service/skyln-user-service.iml" />
+    </modules>
+  </component>
+</project>

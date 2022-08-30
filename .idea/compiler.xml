@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="skyln-product-service" />
+        <module name="skyln-coupon-service" />
+        <module name="skyln-api-gateway" />
+        <module name="skyln-order-service" />
+        <module name="skyln-user-service" />
+        <module name="skyln-common" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="11">
+      <module name="skyln-1024-shop" target="1.8" />
+      <module name="skyln-api-gateway" target="1.8" />
+      <module name="skyln-common" target="1.8" />
+      <module name="skyln-coupon-service" target="1.8" />
+      <module name="skyln-order-service" target="1.8" />
+      <module name="skyln-product-service" target="1.8" />
+      <module name="skyln-user-service" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
