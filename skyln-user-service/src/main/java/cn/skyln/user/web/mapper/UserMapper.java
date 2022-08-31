@@ -1,6 +1,6 @@
 package cn.skyln.user.web.mapper;
 
-import cn.skyln.user.web.model.UserDO;
+import cn.skyln.user.web.model.DO.UserDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

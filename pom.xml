@@ -33,6 +33,7 @@
         <commons.codec.version>1.15</commons.codec.version>
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
         <docker.image.prefix>skyln-cloud-shop</docker.image.prefix>
+        <hutool.version>5.8.5</hutool.version>
 
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
@@ -97,6 +98,12 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-boot-starter</artifactId>
                 <version>${springfox.boot.starter.version}</version>
+            </dependency>
+            <!--hutool-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-json</artifactId>
+                <version>${hutool.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

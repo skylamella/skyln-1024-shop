@@ -1,6 +1,6 @@
 package cn.skyln.user.web.service;
 
-import cn.skyln.user.web.model.AddressDO;
+import cn.skyln.user.web.model.DO.AddressDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2022-08-30
  */
 public interface AddressService extends IService<AddressDO> {
-
+    AddressDO getOneById(long addressId);
 }

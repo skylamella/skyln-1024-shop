@@ -1,4 +1,4 @@
-package cn.skyln.user.web.model;
+package cn.skyln.user.web.model.DO;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
