@@ -34,6 +34,7 @@
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
         <docker.image.prefix>skyln-cloud-shop</docker.image.prefix>
         <hutool.version>5.8.5</hutool.version>
+        <kaptcha.version>1.1.0</kaptcha.version>
 
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
@@ -105,37 +106,15 @@
                 <artifactId>hutool-json</artifactId>
                 <version>${hutool.version}</version>
             </dependency>
+            <!--kaptcha依赖包-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>kaptcha-spring-boot-starter</artifactId>
+                <version>${kaptcha.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
-    <!-- 代码库 -->
-<!--    <repositories>-->
-<!--        <repository>-->
-<!--            <id>maven-ali</id>-->
-<!--            <url>http://maven.aliyun.com/nexus/content/groups/public//</url>-->
-<!--            <releases>-->
-<!--                <enabled>true</enabled>-->
-<!--            </releases>-->
-<!--            <snapshots>-->
-<!--                <enabled>true</enabled>-->
-<!--                <updatePolicy>always</updatePolicy>-->
-<!--                <checksumPolicy>fail</checksumPolicy>-->
-<!--            </snapshots>-->
-<!--        </repository>-->
-<!--    </repositories>-->
-<!--    <pluginRepositories>-->
-<!--        <pluginRepository>-->
-<!--            <id>public</id>-->
-<!--            <name>aliyun nexus</name>-->
-<!--            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>-->
-<!--            <releases>-->
-<!--                <enabled>true</enabled>-->
-<!--            </releases>-->
-<!--            <snapshots>-->
-<!--                <enabled>false</enabled>-->
-<!--            </snapshots>-->
-<!--        </pluginRepository>-->
-<!--    </pluginRepositories>-->
     <!--module不用添加打包版本信息-->
     <build>
         <plugins>
