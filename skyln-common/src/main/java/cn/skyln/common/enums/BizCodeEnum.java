@@ -13,6 +13,7 @@ public enum BizCodeEnum {
      */
     SEARCH_SUCCESS(0,"数据查询成功！"),
     OPERATE_SUCCESS(0,"操作成功！数据更新可能延迟，如刷新后未显示变更，请耐心等待。"),
+    SEND_CODE_SUCCESS(0,"验证码发送成功！"),
 
     /**
      * 通用操作码
@@ -27,7 +28,7 @@ public enum BizCodeEnum {
     CODE_TO_ERROR(200001, "接收号码不合规。"),
     CODE_LIMITED(200002, "验证码发送过快。"),
     CODE_ERROR(200003, "验证码错误。"),
-    CODE_CAPTCHA(200101, "图形验证码错误。"),
+    CODE_CAPTCHA_ERROR(200101, "图形验证码错误。"),
 
     /**
      * 账号

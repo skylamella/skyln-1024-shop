@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.Random;
 
 /**
  * @Author: lamella
@@ -85,44 +85,16 @@ public class CommonUtils {
         return ipAddress;
     }
 
-    public static String randomString(List<String> list) {
-        Map<String, String> map = new HashMap<>();
-        int num = 0;
-        for (String str : list) {
-            String replace = str.replace(" ", "");
-            while (replace.length() > 5) {
-                map.put(String.valueOf(num), replace.substring(0, 5));
-                replace = replace.substring(5);
-                num++;
-            }
-        }
+    public static String getRandomCode(int length) {
+        String source = "0123456789QAZXSWEDCVFRTGBNHYUJMKIOLP";
         StringBuilder sb = new StringBuilder();
-        int temp = getRandomNum(map.size());
-        while (map.size() > 0) {
-            if (map.containsKey(String.valueOf(temp))) {
-                sb.append(map.get(String.valueOf(temp)));
-                map.remove(String.valueOf(temp));
-            }
-            if (map.size() == 1) {
-                Set<String> strings = map.keySet();
-                for(String str : strings){
-                    sb.append(map.get(str));
-                    map.remove(str);
-                }
-            } else {
-                temp = getRandomNum(map.size());
-            }
-            if (map.size() < 10) {
-                Object[] objects = map.keySet().toArray();
-                for (int i = 0; i < objects.length; i++) {
-                    if (i == temp) {
-                        temp = Integer.parseInt(String.valueOf(objects[i]));
-                        break;
-                    }
-                }
-            }
+        for (int i = 0; i < length; i++) {
+            sb.append(source.charAt(getRandomNum(source.length() - 1)));
         }
         return sb.toString();
     }
 
+    public static long getCurrentTimeStamp(){
+        return System.currentTimeMillis();
+    }
 }
