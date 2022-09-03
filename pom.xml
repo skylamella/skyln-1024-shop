@@ -35,6 +35,8 @@
         <docker.image.prefix>skyln-cloud-shop</docker.image.prefix>
         <hutool.version>5.8.5</hutool.version>
         <kaptcha.version>1.1.0</kaptcha.version>
+        <qcloud.cos.version>5.6.89</qcloud.cos.version>
+        <tencentcloudapi.version>3.1.322</tencentcloudapi.version>
 
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
@@ -111,6 +113,17 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>kaptcha-spring-boot-starter</artifactId>
                 <version>${kaptcha.version}</version>
+            </dependency>
+            <!--腾讯云COS依赖包-->
+            <dependency>
+                <groupId>com.qcloud</groupId>
+                <artifactId>cos_api</artifactId>
+                <version>${qcloud.cos.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tencentcloudapi</groupId>
+                <artifactId>tencentcloud-sdk-java</artifactId>
+                <version>${tencentcloudapi.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

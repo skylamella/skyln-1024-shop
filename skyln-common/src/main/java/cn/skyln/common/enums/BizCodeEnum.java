@@ -56,6 +56,11 @@ public enum BizCodeEnum {
     NO_DATA(310003, "数据不存在，请检查后重新输入。"),
 
     /**
+     * 文件相关
+     */
+    FILE_UPLOAD_USER_IMG_FAIL(310101, "用户头像上传失败。"),
+
+    /**
      * 流控
      */
     FLOW_EXCEPTION(320001, "已触发限流，请稍后再次尝试。"),
