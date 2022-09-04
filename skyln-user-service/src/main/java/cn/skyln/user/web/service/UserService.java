@@ -1,11 +1,16 @@
 package cn.skyln.user.web.service;
 
+import cn.skyln.common.utils.JsonData;
 import cn.skyln.user.web.model.DO.UserDO;
+import cn.skyln.user.web.model.REQ.UserLoginRequest;
+import cn.skyln.user.web.model.REQ.UserRegisterRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author skylamella
@@ -14,7 +19,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface UserService extends IService<UserDO> {
     UserDO getOneByMail(String mail);
 
-    void saveOne(UserDO userDO);
+    JsonData userRegister(UserRegisterRequest userRegisterRequest);
 
-    void updateOne(UserDO userDO);
+    void userUpdate(UserDO userDO);
+
+    JsonData userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request);
 }

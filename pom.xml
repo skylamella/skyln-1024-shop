@@ -37,6 +37,8 @@
         <kaptcha.version>1.1.0</kaptcha.version>
         <qcloud.cos.version>5.6.89</qcloud.cos.version>
         <tencentcloudapi.version>3.1.322</tencentcloudapi.version>
+        <jwt.version>0.7.0</jwt.version>
+        <joda.time.version>2.10.13</joda.time.version>
 
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
@@ -124,6 +126,17 @@
                 <groupId>com.tencentcloudapi</groupId>
                 <artifactId>tencentcloud-sdk-java</artifactId>
                 <version>${tencentcloudapi.version}</version>
+            </dependency>
+            <!-- JWT相关 -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda.time.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

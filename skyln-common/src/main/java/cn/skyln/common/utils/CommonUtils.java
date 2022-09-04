@@ -1,8 +1,11 @@
 package cn.skyln.common.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -14,6 +17,7 @@ import java.util.Random;
  * @Description:
  */
 public class CommonUtils {
+    private static final String ALL_CHAR_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     public static String MD5(String oldStr) {
         try {
@@ -86,15 +90,31 @@ public class CommonUtils {
     }
 
     public static String getRandomCode(int length) {
-        String source = "0123456789QAZXSWEDCVFRTGBNHYUJMKIOLP";
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            sb.append(source.charAt(getRandomNum(source.length() - 1)));
+            sb.append(ALL_CHAR_NUM.charAt(getRandomNum(ALL_CHAR_NUM.length() - 1)));
         }
         return sb.toString();
     }
 
     public static long getCurrentTimeStamp(){
         return System.currentTimeMillis();
+    }
+
+    /**
+     * 向前台发送json字符串
+     *
+     * @param response HttpServletResponse
+     * @param json     转化后的json字符串
+     */
+    public static void renderJson(HttpServletResponse response, Object json) {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        try (PrintWriter writer = response.getWriter()) {
+            writer.print(JSON.toJSON(json));
+            response.flushBuffer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

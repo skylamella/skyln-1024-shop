@@ -28,7 +28,7 @@ public class NotifyServiceImpl implements NotifyService {
     @Autowired
     private MailComponent mailComponent;
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     private static final String SUBJECT = "skyln1024商城验证码";
     private static final String CONTENT = "欢迎\"%s\"注册skyln1024商城，您的验证码是\"%s\"，有效期10分钟，请勿向他人透漏验证码。";
@@ -40,7 +40,7 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public JsonData sendCode(SendCodeEnum sendCodeEnum, String to) {
         String cacheKey = String.format(CacheKey.CHECK_CODE_KEY, sendCodeEnum.name(), to);
-        String cacheValue = (String) redisTemplate.opsForValue().get(cacheKey);
+        String cacheValue = redisTemplate.opsForValue().get(cacheKey);
 
         // 如果redis中存在缓存，则判断是否为60秒内重复发送
         if (StringUtils.isNotBlank(cacheValue)) {
@@ -65,5 +65,15 @@ public class NotifyServiceImpl implements NotifyService {
         }
         log.error("{}的号码输入不合规！", to);
         return JsonData.returnJson(BizCodeEnum.CODE_TO_ERROR);
+    }
+
+    @Override
+    public boolean checkCode(SendCodeEnum sendCodeEnum, String to, String code) {
+        String cacheKey = String.format(CacheKey.CHECK_CODE_KEY, sendCodeEnum.name(), to);
+        String cacheValue = redisTemplate.opsForValue().get(cacheKey);
+        if (StringUtils.isNotBlank(cacheValue)) {
+            return StringUtils.equals(cacheValue.split("_")[0], code);
+        }
+        return false;
     }
 }
