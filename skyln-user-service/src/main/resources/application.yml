@@ -1,16 +1,6 @@
 #server:
 #  port: 9001
 #spring:
-#  mail:
-#    host: smtp.qiye.aliyun.com
-#    username: admin@skyln.cn
-#    password: P@ssw0rd
-#    from: admin@skyln.cn
-#    properties.mail.smtp.starttls.enable: true
-#    properties.mail.smtp.starttls.required: true
-#    properties.mail.smtp.ssl.enable: true
-#    default-encoding: utf-8
-
 #  application:
 #    name: skyln-user-service
 #  redis:
