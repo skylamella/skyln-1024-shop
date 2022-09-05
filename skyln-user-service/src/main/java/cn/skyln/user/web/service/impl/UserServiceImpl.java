@@ -2,6 +2,7 @@ package cn.skyln.user.web.service.impl;
 
 import cn.skyln.common.enums.BizCodeEnum;
 import cn.skyln.common.enums.SendCodeEnum;
+import cn.skyln.common.interceptor.LoginInterceptor;
 import cn.skyln.common.model.LoginUser;
 import cn.skyln.common.utils.CommonUtils;
 import cn.skyln.common.utils.JWTUtils;
@@ -11,6 +12,7 @@ import cn.skyln.user.web.mapper.UserMapper;
 import cn.skyln.user.web.model.DO.UserDO;
 import cn.skyln.user.web.model.REQ.UserLoginRequest;
 import cn.skyln.user.web.model.REQ.UserRegisterRequest;
+import cn.skyln.user.web.model.VO.UserVO;
 import cn.skyln.user.web.service.NotifyService;
 import cn.skyln.user.web.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -205,6 +207,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     BizCodeEnum.ACCOUNT_LOGIN_ERROR.getMsg());
             return JsonData.returnJson(BizCodeEnum.ACCOUNT_LOGIN_ERROR);
         }
+    }
+
+    /**
+     * 查询用户个人信息详情
+     *
+     * @return JsonData
+     */
+    @Override
+    public UserVO findUserDetail() {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        UserDO userDo = getOneByMail(loginUser.getMail());
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userDo, userVO);
+        return userVO;
     }
 
     private boolean checkUnique(String mail) {

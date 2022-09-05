@@ -1,6 +1,8 @@
 package cn.skyln.user.web.service;
 
+import cn.skyln.common.utils.JsonData;
 import cn.skyln.user.web.model.DO.AddressDO;
+import cn.skyln.user.web.model.REQ.AddressAddRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -13,4 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface AddressService extends IService<AddressDO> {
     AddressDO getOneById(long addressId);
+
+    JsonData add(AddressAddRequest addressAddRequest);
 }

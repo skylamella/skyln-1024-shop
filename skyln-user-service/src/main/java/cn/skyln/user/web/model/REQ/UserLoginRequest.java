@@ -12,14 +12,12 @@ import lombok.Data;
 @ApiModel(value = "用户登录对象", description = "用户登录请求对象")
 @Data
 public class UserLoginRequest {
-    @ApiModelProperty(value = "密码")
+    @ApiModelProperty(value = "密码", example = "123456")
     private String pwd;
 
-    @ApiModelProperty(value = "邮箱")
+    @ApiModelProperty(value = "邮箱", example = "lamella@skyln.cn")
     private String mail;
 
-    private String ip;
-
-    @ApiModelProperty(value = "安全模式")
+    @ApiModelProperty(value = "安全模式", example = "1")
     private int safeMode;
 }

@@ -6,6 +6,7 @@ import cn.skyln.common.utils.JsonData;
 import cn.skyln.user.component.CosComponent;
 import cn.skyln.user.web.model.REQ.UserLoginRequest;
 import cn.skyln.user.web.model.REQ.UserRegisterRequest;
+import cn.skyln.user.web.model.VO.UserVO;
 import cn.skyln.user.web.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,15 +55,22 @@ public class UserController {
 
     @ApiOperation("用户注册")
     @PostMapping("register")
-    public JsonData register(@ApiParam(value = "用户注册对象", required = true) @RequestBody UserRegisterRequest userRegisterRequest){
+    public JsonData register(@ApiParam(value = "用户注册对象", required = true) @RequestBody UserRegisterRequest userRegisterRequest) {
         return userService.userRegister(userRegisterRequest);
     }
 
     @ApiOperation("用户登录")
     @PostMapping("login")
     public JsonData login(@ApiParam(value = "用户登录对象", required = true) @RequestBody UserLoginRequest userLoginRequest,
-                          HttpServletRequest request){
-        return userService.userLogin(userLoginRequest,request);
+                          HttpServletRequest request) {
+        return userService.userLogin(userLoginRequest, request);
+    }
+
+    @ApiOperation("用户个人信息")
+    @PostMapping("detail")
+    public JsonData userDetail() {
+        UserVO userVO = userService.findUserDetail();
+        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, userVO);
     }
 
 }
