@@ -20,8 +20,8 @@ public class CheckUtil {
     private static final Pattern PHONE_PATTERN = Pattern.compile("^((13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$");
 
     /**
-     * @param email
-     * @return
+     * @param email 邮箱号
+     * @return 是否是邮箱
      */
     public static boolean isEmail(String email) {
         if (null == email || "".equals(email)) {
@@ -32,8 +32,8 @@ public class CheckUtil {
     }
 
     /**
-     * @param phone
-     * @return
+     * @param phone 手机号
+     * @return 是否是手机号
      */
     public static boolean isPhone(String phone) {
         if (null == phone || "".equals(phone)) {
@@ -41,5 +41,15 @@ public class CheckUtil {
         }
         Matcher m = PHONE_PATTERN.matcher(phone);
         return m.matches();
+    }
+
+    /**
+     * 判断一个字符串是否是数字
+     * @param str 待判断字符串
+     * @return 待判断字符串是否是数字
+     */
+    public static boolean stringIsNumeric(String str) {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        return pattern.matcher(str).matches();
     }
 }

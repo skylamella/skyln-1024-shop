@@ -1,4 +1,4 @@
-package cn.skyln.user.interceptor;
+package cn.skyln.common.interceptor;
 
 import cn.skyln.common.enums.BizCodeEnum;
 import cn.skyln.common.model.LoginUser;
@@ -89,7 +89,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         loginUser.setHeadImg(claims.get("head_img").toString());
         loginUser.setMail(claims.get("mail").toString());
         loginUser.setName(claims.get("name").toString());
-        loginUser.setId(Long.valueOf(claims.get("mail").toString()));
+        loginUser.setId(Long.valueOf(claims.get("id").toString()));
         threadLocal.set(loginUser);
         return true;
     }

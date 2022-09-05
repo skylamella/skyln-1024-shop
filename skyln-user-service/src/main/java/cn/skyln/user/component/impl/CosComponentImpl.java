@@ -49,6 +49,14 @@ public class CosComponentImpl implements CosComponent {
 
     private static final String CAM_POLICY = "{\"version\":\"2.0\",\"statement\":[{\"action\":[\"cos:*\"],\"resource\":\"*\",\"effect\":\"allow\"},{\"effect\":\"allow\",\"action\":[\"monitor:*\",\"cam:ListUsersForGroup\",\"cam:ListGroups\",\"cam:GetGroup\"],\"resource\":\"*\"}]}";
 
+    /**
+     * 上传文件到腾讯云COS
+     *
+     * @param folder     文件路径
+     * @param uploadFile 待上传文件
+     * @param useForName 用途
+     * @return 文件访问URL
+     */
     @Override
     public String uploadFileResult(String folder, MultipartFile uploadFile, String useForName) {
         TransferManager transferManager = createTransferManager(useForName);

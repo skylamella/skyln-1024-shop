@@ -1,10 +1,6 @@
 package cn.skyln.user.component;
 
-import com.qcloud.cos.model.PutObjectResult;
-import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 /**
  * @Author: lamella
@@ -12,5 +8,13 @@ import java.io.IOException;
  * @Description:
  */
 public interface CosComponent {
+    /**
+     * 上传文件到腾讯云COS
+     *
+     * @param folder     文件路径
+     * @param uploadFile 待上传文件
+     * @param useForName 用途
+     * @return 文件访问URL
+     */
     String uploadFileResult(String folder, MultipartFile uploadFile, String useForName);
 }

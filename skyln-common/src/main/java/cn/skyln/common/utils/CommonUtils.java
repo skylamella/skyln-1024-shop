@@ -10,6 +10,7 @@ import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 /**
  * @Author: lamella
@@ -19,6 +20,11 @@ import java.util.Random;
 public class CommonUtils {
     private static final String ALL_CHAR_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
+    /**
+     * MD5加密字符串
+     * @param oldStr 待加密字符串
+     * @return 加密后字符串
+     */
     public static String MD5(String oldStr) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -35,6 +41,11 @@ public class CommonUtils {
         return null;
     }
 
+    /**
+     * 获取完整URL
+     * @param request HttpServletRequest
+     * @return 完整URL
+     */
     public static String getFullUrl(HttpServletRequest request) {
         String requestURL = request.getRequestURL().toString();
         String queryString = request.getQueryString();
@@ -44,6 +55,11 @@ public class CommonUtils {
         return requestURL;
     }
 
+    /**
+     * 获取一个随机整数
+     * @param maxNum 随机整数边界
+     * @return 随机整数
+     */
     public static int getRandomNum(int maxNum) {
         if (maxNum == 1) {
             return 0;
@@ -58,6 +74,11 @@ public class CommonUtils {
         }
     }
 
+    /**
+     * 获取访问用户的IP地址
+     * @param request HttpServletRequest
+     * @return 访问用户的IP地址
+     */
     public static String getIpAddr(HttpServletRequest request) {
         String ipAddress = null;
         try {
@@ -89,6 +110,11 @@ public class CommonUtils {
         return ipAddress;
     }
 
+    /**
+     * 生成随机字符串
+     * @param length 随机字符串长度
+     * @return 随机字符串
+     */
     public static String getRandomCode(int length) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {

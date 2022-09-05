@@ -135,9 +135,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         userMapper.updateById(userDO);
     }
 
+    /**
+     * 用户登录
+     * 判断传递的邮箱号是否为空
+     * 判断传入的密码是否为空
+     * 判断账号是否存在
+     * 判断密码是否正确
+     *
+     * @param userLoginRequest 用户登录请求对象
+     * @param request          HttpServletRequest
+     * @return JsonData
+     */
     @Override
     public JsonData userLogin(UserLoginRequest userLoginRequest, HttpServletRequest request) {
-        // 判断传递的密码是否为空
+        // 判断传递的邮箱号是否为空
         if (StringUtils.isEmpty(userLoginRequest.getMail())) {
             log.error("[{}] {}",
                     BizCodeEnum.ACCOUNT_NOT_EXIST_ERROR.getCode(),

@@ -37,6 +37,13 @@ public class NotifyServiceImpl implements NotifyService {
      */
     private static final long CAPTCHA_CODE_EXPIRED = 10;
 
+    /**
+     * 发送验证码邮件
+     *
+     * @param sendCodeEnum 发送验证码的用途
+     * @param to           收件人
+     * @return JsonData
+     */
     @Override
     public JsonData sendCode(SendCodeEnum sendCodeEnum, String to) {
         String cacheKey = String.format(CacheKey.CHECK_CODE_KEY, sendCodeEnum.name(), to);
@@ -67,6 +74,14 @@ public class NotifyServiceImpl implements NotifyService {
         return JsonData.returnJson(BizCodeEnum.CODE_TO_ERROR);
     }
 
+    /**
+     * 验证码校验
+     *
+     * @param sendCodeEnum 发送验证码的用途
+     * @param to           收件人
+     * @param code         验证码
+     * @return 验证码是否匹配
+     */
     @Override
     public boolean checkCode(SendCodeEnum sendCodeEnum, String to, String code) {
         String cacheKey = String.format(CacheKey.CHECK_CODE_KEY, sendCodeEnum.name(), to);

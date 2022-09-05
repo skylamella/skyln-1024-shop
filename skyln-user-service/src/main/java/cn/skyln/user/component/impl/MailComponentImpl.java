@@ -27,6 +27,13 @@ public class MailComponentImpl implements MailComponent {
     @Value("${spring.mail.from}")
     private String from;
 
+    /**
+     * 发送一封右键
+     *
+     * @param to      收件人
+     * @param subject 邮件主题
+     * @param content 邮件正文
+     */
     @Override
     public void sendSimpleMail(String to, String subject, String content) {
         //创建SimpleMailMessage对象
