@@ -11,7 +11,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
-@ApiModel(value = "收货地址对象", description = "收货地址对象")
+@ApiModel(value = "新增收货地址对象", description = "新增收货地址对象")
 public class AddressAddRequest {
     /**
      * 是否默认收货地址：0->否；1->是

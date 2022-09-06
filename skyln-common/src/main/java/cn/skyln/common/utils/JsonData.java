@@ -19,27 +19,15 @@ public class JsonData {
     private Object data;
     private String msg;
 
-    public static JsonData returnJson(int code) {
-        return new JsonData(code, null, null);
-    }
-
     public static JsonData returnJson(int code, String msg) {
         return new JsonData(code, null, msg);
     }
 
-    public static JsonData returnJson(int code, Object data) {
-        return new JsonData(code, data, null);
-    }
-
-    public static JsonData returnJson(int code, String msg, Object data) {
-        return new JsonData(code, data, msg);
-    }
-
     public static JsonData returnJson(BizCodeEnum bizCodeEnum) {
-        return returnJson(bizCodeEnum.getCode(), bizCodeEnum.getMsg());
+        return new JsonData(bizCodeEnum.getCode(), null, bizCodeEnum.getMsg());
     }
 
     public static JsonData returnJson(BizCodeEnum bizCodeEnum, Object data) {
-        return returnJson(bizCodeEnum.getCode(), bizCodeEnum.getMsg(), data);
+        return new JsonData(bizCodeEnum.getCode(), data, bizCodeEnum.getMsg());
     }
 }

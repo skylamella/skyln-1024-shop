@@ -71,10 +71,9 @@ public class NotifyController {
                                      HttpServletRequest request) {
         String key = getCaptchaKey(request);
         String cacheCaptcha = (String) redisTemplate.opsForValue().get(key);
-
-        if (StringUtils.isEmpty(key) || StringUtils.isEmpty(cacheCaptcha) || !StringUtils.equalsIgnoreCase(key, cacheCaptcha)) {
+        if (StringUtils.isEmpty(key) || StringUtils.isEmpty(cacheCaptcha) || !StringUtils.equalsIgnoreCase(captcha, cacheCaptcha)) {
             return JsonData.returnJson(BizCodeEnum.CODE_CAPTCHA_ERROR);
-        }else {
+        } else {
             redisTemplate.delete(key);
             return notifyService.sendCode(SendCodeEnum.USER_REGISTER, to);
         }

@@ -2,6 +2,7 @@ package cn.skyln.user.test;
 
 import cn.skyln.user.UserApplication;
 import cn.skyln.user.web.model.DO.AddressDO;
+import cn.skyln.user.web.model.VO.AddressVO;
 import cn.skyln.user.web.service.AddressService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class AddressTest {
 
     @Test
     public void testAddressDetail(){
-        AddressDO addressDO = addressService.getOneById(1L);
+        AddressVO addressDO = addressService.getOneById(1L);
         log.info(addressDO.toString());
     }
 }

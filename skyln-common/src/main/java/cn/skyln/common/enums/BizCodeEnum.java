@@ -48,6 +48,48 @@ public enum BizCodeEnum {
     ACCOUNT_ACCESS_TOKEN_EXPIRED_RELOGIN(210011, "当前token过期且需要重新登录。"),
     ACCOUNT_SAFE_MODE_RELOGIN(210012, "两次登录的IP地址不同，请重新登录。"),
 
+    /**
+     * 地址相关
+     */
+    ADDRESS_NOT_EXIT(211001, "收货地址不存在。"),
+    ADDRESS_ADD_FAIL(211002,"新增收货地址失败"),
+    ADDRESS_DEL_FAIL(211003,"删除收货地址失败"),
+    ADDRESS_UPD_FAIL(211004,"更新收货地址失败"),
+
+    /**
+     * 优惠券
+     */
+    COUPON_CONDITION_ERROR(270001,"优惠券条件错误"),
+    COUPON_UNAVAILABLE(270002,"没有可用的优惠券"),
+    COUPON_NO_EXITS(270003,"优惠券不存在"),
+    COUPON_NO_STOCK(270005,"优惠券库存不足"),
+    COUPON_OUT_OF_LIMIT(270006,"优惠券领取超过限制次数"),
+    COUPON_OUT_OF_TIME(270407,"优惠券不在领取时间范围"),
+    COUPON_GET_FAIL(270407,"优惠券领取失败"),
+    COUPON_RECORD_LOCK_FAIL(270409,"优惠券锁定失败"),
+
+    /**
+     * 订单
+     */
+    ORDER_CONFIRM_COUPON_FAIL(280001,"创建订单-优惠券使用失败,不满足价格条件"),
+    ORDER_CONFIRM_PRICE_FAIL(280002,"创建订单-验价失败"),
+    ORDER_CONFIRM_LOCK_PRODUCT_FAIL(280003,"创建订单-商品库存不足锁定失败"),
+    ORDER_CONFIRM_ADD_STOCK_TASK_FAIL(280004,"创建订单-新增商品库存锁定任务"),
+    ORDER_CONFIRM_TOKEN_NOT_EXIST(280008,"订单令牌缺少"),
+    ORDER_CONFIRM_TOKEN_EQUAL_FAIL(280009,"订单令牌不正确"),
+    ORDER_CONFIRM_NOT_EXIST(280010,"订单不存在"),
+    ORDER_CONFIRM_CART_ITEM_NOT_EXIST(280011,"购物车商品项不存在"),
+
+    /**
+     * 支付
+     */
+    PAY_ORDER_FAIL(290001,"创建支付订单失败"),
+    PAY_ORDER_CALLBACK_SIGN_FAIL(290002,"支付订单回调验证签失败"),
+    PAY_ORDER_CALLBACK_NOT_SUCCESS(290003,"创建支付订单失败"),
+    PAY_ORDER_NOT_EXIST(290005,"订单不存在"),
+    PAY_ORDER_STATE_ERROR(290006,"订单状态不正常"),
+    PAY_ORDER_PAY_TIMEOUT(290007,"订单支付超时"),
+
     // 各服务枚举结束
 
     // 系统枚举开始
@@ -62,22 +104,22 @@ public enum BizCodeEnum {
      * 数据
      */
     DATA_SPECIFICATION(310001, "数据不符合规范，请检查后重新输入。"),
-    ERROR_DATA(310002, "错误数据"),
-    NO_DATA(310003, "数据不存在，请检查后重新输入。"),
+    DATA_ERROR(310002, "错误数据"),
+    DATA_NOT_EXIST(310003, "数据不存在，请检查后重新输入。"),
 
     /**
      * 文件相关
      */
-    FILE_UPLOAD_USER_IMG_FAIL(310101, "用户头像上传失败。"),
+    FILE_UPLOAD_USER_IMG_FAIL(311001, "用户头像上传失败。"),
 
     /**
      * 流控
      */
-    FLOW_EXCEPTION(320001, "已触发限流，请稍后再次尝试。"),
-    DEGRADE_EXCEPTION(320002, "已触发降级，请稍后再次尝试。"),
-    PARAM_FLOW_EXCEPTION(320003, "热点参数异常，已触发流量控制，请稍后再次尝试。"),
-    SYSTEM_BLOCK_EXCEPTION(320004, "系统规则异常，已触发流量控制，请稍后再次尝试。"),
-    AUTHORITY_EXCEPTION(320005, "认证异常，已触发流量控制，请稍后再次尝试。");
+    CONTROL_FLOW_EXCEPTION(320001, "已触发限流，请稍后再次尝试。"),
+    CONTROL_DEGRADE_EXCEPTION(320002, "已触发降级，请稍后再次尝试。"),
+    CONTROL_PARAM_FLOW_EXCEPTION(320003, "热点参数异常，已触发流量控制，请稍后再次尝试。"),
+    CONTROL_SYSTEM_BLOCK_EXCEPTION(320004, "系统规则异常，已触发流量控制，请稍后再次尝试。"),
+    CONTROL_AUTHORITY_EXCEPTION(320005, "认证异常，已触发流量控制，请稍后再次尝试。");
 
     // 系统枚举结束
 

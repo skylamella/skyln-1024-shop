@@ -65,10 +65,10 @@ public class NotifyServiceImpl implements NotifyService {
         if (CheckUtil.isEmail(to)) {
             mailComponent.sendSimpleMail(to, SUBJECT, String.format(CONTENT, to, code));
             log.info("{}的验证码发送成功！", to);
-            return JsonData.returnJson(BizCodeEnum.SEND_CODE_SUCCESS, code);
+            return JsonData.returnJson(BizCodeEnum.SEND_CODE_SUCCESS, to);
         } else if (CheckUtil.isPhone(to)) {
             log.info("{}的验证码发送成功！", to);
-            return JsonData.returnJson(BizCodeEnum.SEND_CODE_SUCCESS, code);
+            return JsonData.returnJson(BizCodeEnum.SEND_CODE_SUCCESS, to);
         }
         log.error("{}的号码输入不合规！", to);
         return JsonData.returnJson(BizCodeEnum.CODE_TO_ERROR);
