@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: skyln-coupon-service
+  cloud:
+    nacos:
+      config:
+        server-addr: 192.168.121.130:8848 #Nacos配置中心地址
+        file-extension: yaml #文件拓展格式
+  profiles:
+    active: dev
