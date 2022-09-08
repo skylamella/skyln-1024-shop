@@ -17,8 +17,6 @@ import java.util.Base64;
 public class RsaUtils {
     private static final int DEFAULT_KEY_SIZE = 4096;
 
-    private static final String FOLDER = System.getProperty("user.dir") + "\\src\\main\\resources\\rsa\\";
-
     private static final String PUBLIC_KEY_FILE_NAME = "publicKey";
 
     private static final String PRIVATE_KEY_FILE_NAME = "privateKey";
@@ -88,15 +86,15 @@ public class RsaUtils {
         // 获取公钥并写出
         byte[] publicKeyBytes = keyPair.getPublic().getEncoded();
         publicKeyBytes = Base64.getEncoder().encode(publicKeyBytes);
-        writeFile(FOLDER + PUBLIC_KEY_FILE_NAME, publicKeyBytes);
+        writeFile(setFolder() + PUBLIC_KEY_FILE_NAME, publicKeyBytes);
         // 获取私钥并写出
         byte[] privateKeyBytes = keyPair.getPrivate().getEncoded();
         privateKeyBytes = Base64.getEncoder().encode(privateKeyBytes);
-        writeFile(FOLDER + PRIVATE_KEY_FILE_NAME, privateKeyBytes);
+        writeFile(setFolder() + PRIVATE_KEY_FILE_NAME, privateKeyBytes);
     }
 
     private static byte[] readFile(String fileName) throws Exception {
-        return Files.readAllBytes(new File(FOLDER + fileName).toPath());
+        return Files.readAllBytes(new File(setFolder() + fileName).toPath());
     }
 
     private static void writeFile(String destPath, byte[] bytes) throws IOException {
@@ -106,5 +104,13 @@ public class RsaUtils {
             dest.createNewFile();
         }
         Files.write(dest.toPath(), bytes);
+    }
+
+    private static String setFolder(){
+        StringBuilder sb = new StringBuilder();
+        String separator = File.separator;
+        String userHome = System.getProperty("user.home");
+        sb.append(userHome).append(separator).append("rsa").append(separator);
+        return sb.toString();
     }
 }
