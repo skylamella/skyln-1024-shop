@@ -1,7 +1,7 @@
 package cn.skyln.user.test;
 
 import cn.hutool.json.JSONObject;
-import cn.skyln.user.UserApplication;
+import cn.skyln.UserApplication;
 import com.tencentcloudapi.common.Credential;
 import com.tencentcloudapi.common.exception.TencentCloudSDKException;
 import com.tencentcloudapi.common.profile.ClientProfile;

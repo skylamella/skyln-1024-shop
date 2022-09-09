@@ -1,7 +1,7 @@
 package cn.skyln.user.test;
 
-import cn.skyln.user.UserApplication;
-import cn.skyln.user.component.MailComponent;
+import cn.skyln.UserApplication;
+import cn.skyln.component.MailComponent;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

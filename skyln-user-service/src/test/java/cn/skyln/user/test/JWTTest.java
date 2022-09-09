@@ -1,9 +1,9 @@
 package cn.skyln.user.test;
 
-import cn.skyln.common.model.LoginUser;
-import cn.skyln.common.utils.JWTUtils;
-import cn.skyln.common.utils.RsaUtils;
-import cn.skyln.user.UserApplication;
+import cn.skyln.model.LoginUser;
+import cn.skyln.utils.JWTUtils;
+import cn.skyln.utils.RsaUtils;
+import cn.skyln.UserApplication;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;

@@ -1,9 +1,8 @@
 package cn.skyln.user.test;
 
-import cn.skyln.user.UserApplication;
-import cn.skyln.user.web.model.DO.AddressDO;
-import cn.skyln.user.web.model.VO.AddressVO;
-import cn.skyln.user.web.service.AddressService;
+import cn.skyln.UserApplication;
+import cn.skyln.web.model.VO.AddressVO;
+import cn.skyln.web.service.AddressService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.skyln.user.web.mapper.UserMapper">
+<mapper namespace="cn.skyln.web.mapper.UserMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="cn.skyln.user.web.model.DO.UserDO">
+    <resultMap id="BaseResultMap" type="cn.skyln.web.model.DO.UserDO">
         <id column="id" property="id" />
         <result column="name" property="name" />
         <result column="pwd" property="pwd" />

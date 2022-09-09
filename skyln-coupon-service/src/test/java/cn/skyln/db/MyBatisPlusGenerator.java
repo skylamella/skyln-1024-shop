@@ -65,7 +65,7 @@ public class MyBatisPlusGenerator {
                 .setInclude("coupon", "coupon_record");
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
-        pkConfig.setParent("cn.skyln.coupon.web")
+        pkConfig.setParent("cn.skyln.web")
                 .setMapper("mapper")
                 .setService("service")
                 .setController("controller")
