@@ -59,36 +59,44 @@ public enum BizCodeEnum {
     /**
      * 优惠券
      */
-    COUPON_CONDITION_ERROR(270001,"优惠券条件错误"),
-    COUPON_UNAVAILABLE(270002,"没有可用的优惠券"),
-    COUPON_NO_EXITS(270003,"优惠券不存在"),
-    COUPON_NO_STOCK(270005,"优惠券库存不足"),
-    COUPON_OUT_OF_LIMIT(270006,"优惠券领取超过限制次数"),
-    COUPON_OUT_OF_TIME(270407,"优惠券不在领取时间范围"),
-    COUPON_GET_FAIL(270407,"优惠券领取失败"),
-    COUPON_RECORD_LOCK_FAIL(270409,"优惠券锁定失败"),
+    COUPON_CONDITION_ERROR(220001,"优惠券条件错误"),
+    COUPON_UNAVAILABLE(220002,"没有可用的优惠券"),
+    COUPON_NO_EXITS(220003,"优惠券不存在"),
+    COUPON_NO_STOCK(220005,"优惠券库存不足"),
+    COUPON_OUT_OF_LIMIT(220006,"优惠券领取超过限制次数"),
+    COUPON_OUT_OF_TIME(220007,"优惠券不在领取时间范围"),
+    COUPON_GET_FAIL(220008,"优惠券领取失败"),
+    COUPON_RECORD_LOCK_FAIL(220009,"优惠券锁定失败"),
 
     /**
      * 订单
      */
-    ORDER_CONFIRM_COUPON_FAIL(280001,"创建订单-优惠券使用失败,不满足价格条件"),
-    ORDER_CONFIRM_PRICE_FAIL(280002,"创建订单-验价失败"),
-    ORDER_CONFIRM_LOCK_PRODUCT_FAIL(280003,"创建订单-商品库存不足锁定失败"),
-    ORDER_CONFIRM_ADD_STOCK_TASK_FAIL(280004,"创建订单-新增商品库存锁定任务"),
-    ORDER_CONFIRM_TOKEN_NOT_EXIST(280008,"订单令牌缺少"),
-    ORDER_CONFIRM_TOKEN_EQUAL_FAIL(280009,"订单令牌不正确"),
-    ORDER_CONFIRM_NOT_EXIST(280010,"订单不存在"),
-    ORDER_CONFIRM_CART_ITEM_NOT_EXIST(280011,"购物车商品项不存在"),
+    ORDER_CONFIRM_COUPON_FAIL(230001,"创建订单-优惠券使用失败,不满足价格条件"),
+    ORDER_CONFIRM_PRICE_FAIL(230002,"创建订单-验价失败"),
+    ORDER_CONFIRM_LOCK_PRODUCT_FAIL(230003,"创建订单-商品库存不足锁定失败"),
+    ORDER_CONFIRM_ADD_STOCK_TASK_FAIL(230004,"创建订单-新增商品库存锁定任务"),
+    ORDER_CONFIRM_TOKEN_NOT_EXIST(230008,"订单令牌缺少"),
+    ORDER_CONFIRM_TOKEN_EQUAL_FAIL(230009,"订单令牌不正确"),
+    ORDER_CONFIRM_NOT_EXIST(230010,"订单不存在"),
+    ORDER_CONFIRM_CART_ITEM_NOT_EXIST(230011,"购物车商品项不存在"),
 
     /**
      * 支付
      */
-    PAY_ORDER_FAIL(290001,"创建支付订单失败"),
-    PAY_ORDER_CALLBACK_SIGN_FAIL(290002,"支付订单回调验证签失败"),
-    PAY_ORDER_CALLBACK_NOT_SUCCESS(290003,"创建支付订单失败"),
-    PAY_ORDER_NOT_EXIST(290005,"订单不存在"),
-    PAY_ORDER_STATE_ERROR(290006,"订单状态不正常"),
-    PAY_ORDER_PAY_TIMEOUT(290007,"订单支付超时"),
+    PAY_ORDER_FAIL(240001,"创建支付订单失败"),
+    PAY_ORDER_CALLBACK_SIGN_FAIL(240002,"支付订单回调验证签失败"),
+    PAY_ORDER_CALLBACK_NOT_SUCCESS(240003,"创建支付订单失败"),
+    PAY_ORDER_NOT_EXIST(240005,"订单不存在"),
+    PAY_ORDER_STATE_ERROR(240006,"订单状态不正常"),
+    PAY_ORDER_PAY_TIMEOUT(240007,"订单支付超时"),
+
+    /**
+     * 轮播图相关
+     */
+    BANNER_NOT_EXIT(250001, "轮播图不存在。"),
+    BANNER_ADD_FAIL(250002,"新增轮播图失败"),
+    BANNER_DEL_FAIL(250003,"删除轮播图失败"),
+    BANNER_UPD_FAIL(250004,"更新轮播图失败"),
 
     // 各服务枚举结束
 
