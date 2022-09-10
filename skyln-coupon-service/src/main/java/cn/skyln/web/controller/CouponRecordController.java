@@ -3,19 +3,18 @@ package cn.skyln.web.controller;
 
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
+import cn.skyln.web.model.VO.CouponRecordVO;
 import cn.skyln.web.service.CouponRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -40,6 +39,16 @@ public class CouponRecordController {
                              @ApiParam(value = "查询类型", required = true) @RequestParam(value = "use_state", defaultValue = "ALL") String useState) {
         Map<String, Object> pageMap = couponRecordService.pageCouponActivity(page, size, useState);
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, pageMap);
+    }
+
+    @ApiOperation("查询优惠券记录详情")
+    @GetMapping("detail/{coupon_record_id}")
+    public JsonData couponRecordDetail(@ApiParam(value = "记录ID", required = true) @PathVariable(value = "coupon_record_id") long couponRecordId){
+        CouponRecordVO couponRecordVO = couponRecordService.getOneById(couponRecordId);
+        if (Objects.isNull(couponRecordVO)) {
+            return JsonData.returnJson(BizCodeEnum.COUPON_NO_EXITS);
+        }
+        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, couponRecordVO);
     }
 }
 

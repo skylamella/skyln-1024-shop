@@ -1,6 +1,7 @@
 package cn.skyln.web.service;
 
 import cn.skyln.web.model.DO.CouponRecordDO;
+import cn.skyln.web.model.VO.CouponRecordVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -24,4 +25,12 @@ public interface CouponRecordService extends IService<CouponRecordDO> {
      * @return Map
      */
     Map<String, Object> pageCouponActivity(int page, int size, String useState);
+
+    /**
+     * 根据ID查询优惠券记录详情
+     *
+     * @param couponRecordId 记录ID
+     * @return CouponRecordVO
+     */
+    CouponRecordVO getOneById(long couponRecordId);
 }

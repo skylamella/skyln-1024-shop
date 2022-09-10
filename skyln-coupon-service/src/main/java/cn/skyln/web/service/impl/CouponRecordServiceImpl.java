@@ -12,10 +12,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -60,5 +62,25 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
                 recordDOPage.getRecords().stream().map(obj ->
                                 CouponUtils.beanProcess(obj, new CouponRecordVO()))
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * 根据ID查询优惠券记录详情
+     *
+     * @param couponRecordId 记录ID
+     * @return CouponRecordVO
+     */
+    @Override
+    public CouponRecordVO getOneById(long couponRecordId) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        CouponRecordDO couponRecordDO = couponRecordMapper.selectOne(new QueryWrapper<CouponRecordDO>()
+                .eq("id", couponRecordId)
+                .eq("user_id", loginUser.getId()));
+        if (Objects.isNull(couponRecordDO)) {
+            return null;
+        }
+        CouponRecordVO couponRecordVO = new CouponRecordVO();
+        BeanUtils.copyProperties(couponRecordDO, couponRecordVO);
+        return couponRecordVO;
     }
 }
