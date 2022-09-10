@@ -37,7 +37,7 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, BannerDO> imple
      */
     @Override
     public JsonData findAllBanner() {
-        List<BannerDO> bannerDOList = bannerMapper.selectList(new QueryWrapper<BannerDO>().orderByDesc("weight"));
+        List<BannerDO> bannerDOList = bannerMapper.selectList(new QueryWrapper<BannerDO>().orderByAsc("weight"));
         if (Objects.isNull(bannerDOList)) {
             return JsonData.returnJson(BizCodeEnum.BANNER_NOT_EXIT);
         }
