@@ -9,6 +9,7 @@ import cn.skyln.exception.BizException;
 import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.LoginUser;
 import cn.skyln.utils.CommonUtils;
+import cn.skyln.utils.CouponUtils;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.mapper.CouponMapper;
 import cn.skyln.web.mapper.CouponRecordMapper;
@@ -30,10 +31,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -71,12 +70,11 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
                 .eq("publish", CouponPublishEnum.PUBLISH)
                 .eq("category", CouponCategoryEnum.PROMOTION)
                 .orderByDesc("create_time"));
-
-        Map<String, Object> pageMap = new HashMap<>();
-        pageMap.put("total_record", couponDOIPage.getTotal());
-        pageMap.put("total_page", couponDOIPage.getPages());
-        pageMap.put("current_data", couponDOIPage.getRecords().stream().map(this::beanProcess).collect(Collectors.toList()));
-        return pageMap;
+        return CouponUtils.getReturnPageMap(couponDOIPage.getTotal(),
+                couponDOIPage.getPages(),
+                couponDOIPage.getRecords().stream().map(obj ->
+                                CouponUtils.beanProcess(obj, new CouponVO()))
+                        .collect(Collectors.toList()));
     }
 
     /**
@@ -90,7 +88,7 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
      * @param promotion 优惠券类型
      * @return JsonData
      */
-    @Transactional(rollbackFor=Exception.class,propagation= Propagation.REQUIRED)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
     public JsonData addCoupon(long couponId, CouponCategoryEnum promotion) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
@@ -131,12 +129,6 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
             log.info("领券接口分布式锁解锁成功:{}", Thread.currentThread().getId());
         }
         return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
-    }
-
-    private Object beanProcess(CouponDO couponDO) {
-        CouponVO couponVO = new CouponVO();
-        BeanUtils.copyProperties(couponDO, couponVO);
-        return couponVO;
     }
 
     /**

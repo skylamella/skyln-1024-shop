@@ -17,9 +17,7 @@ import java.util.Date;
  * @since 2022-09-07
  */
 @Data
-public class CouponVO implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class CouponVO {
 
     /**
      * id

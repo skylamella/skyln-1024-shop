@@ -17,9 +17,8 @@ import java.util.Date;
  * @since 2022-09-07
  */
 @Data
-public class CouponRecordVO implements Serializable {
+public class CouponRecordVO {
 
-    private static final long serialVersionUID = 1L;
 
     private Long id;
 
@@ -33,6 +32,7 @@ public class CouponRecordVO implements Serializable {
      * 创建时间获得时间
      */
     @JsonProperty("create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",locale = "zh",timezone = "GMT+8")
     private Date createTime;
 
     /**
@@ -44,13 +44,13 @@ public class CouponRecordVO implements Serializable {
     /**
      * 用户id
      */
-    @JsonProperty("coupon_id")
+    @JsonProperty("user_id")
     private Long userId;
 
     /**
      * 用户昵称
      */
-    @JsonProperty("coupon_id")
+    @JsonProperty("user_name")
     private String userName;
 
     /**
