@@ -1,5 +1,6 @@
 package cn.skyln.web.service.impl;
 
+import cn.skyln.constant.CacheKey;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.enums.CouponCategoryEnum;
 import cn.skyln.enums.CouponPublishEnum;
@@ -20,14 +21,19 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +53,9 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
 
     @Autowired
     private CouponRecordMapper couponRecordMapper;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     /**
      * 分页查询优惠券
@@ -81,35 +90,45 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
      * @param promotion 优惠券类型
      * @return JsonData
      */
+    @Transactional(rollbackFor=Exception.class,propagation= Propagation.REQUIRED)
     @Override
     public JsonData addCoupon(long couponId, CouponCategoryEnum promotion) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
-                .eq("id", couponId)
-                .eq("category", promotion.name())
-                .eq("publish", CouponPublishEnum.PUBLISH.name()));
-        // 判断优惠券是否可以领取
-        checkCoupon(couponDO, loginUser.getId());
+        String lockKey = String.format(CacheKey.DISTRIBUTED_LOCK_KEY, "coupon", couponId);
+        RLock lock = redissonClient.getLock(lockKey);
+        lock.lock();
+        try {
+            log.info("领券接口分布式锁加锁成功:{}", Thread.currentThread().getId());
+            CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
+                    .eq("id", couponId)
+                    .eq("category", promotion.name())
+                    .eq("publish", CouponPublishEnum.PUBLISH.name()));
+            // 判断优惠券是否可以领取
+            checkCoupon(couponDO, loginUser.getId());
 
-        // 构建领券记录
-        CouponRecordDO couponRecordDO = new CouponRecordDO();
-        BeanUtils.copyProperties(couponDO, couponRecordDO);
-        couponRecordDO.setCreateTime(new Date());
-        couponRecordDO.setUseState(CouponUseStateEnum.NEW.name());
-        couponRecordDO.setUserId(loginUser.getId());
-        couponRecordDO.setUserName(loginUser.getName());
-        couponRecordDO.setCouponId(couponId);
-        couponRecordDO.setId(null);
+            // 构建领券记录
+            CouponRecordDO couponRecordDO = new CouponRecordDO();
+            BeanUtils.copyProperties(couponDO, couponRecordDO);
+            couponRecordDO.setCreateTime(new Date());
+            couponRecordDO.setUseState(CouponUseStateEnum.NEW.name());
+            couponRecordDO.setUserId(loginUser.getId());
+            couponRecordDO.setUserName(loginUser.getName());
+            couponRecordDO.setCouponId(couponId);
+            couponRecordDO.setId(null);
 
-        // 扣减库存
-        int rows = couponMapper.reduceStock(couponId, couponDO.getVersion());
+            // 扣减库存
+            int rows = couponMapper.reduceStock(couponId, couponDO.getVersion());
 
-        if (rows == 1) {
-            // 库存扣减成功才保存记录
-            couponRecordMapper.insert(couponRecordDO);
-        } else {
-            log.error("发放优惠券失败：{}，用户：{}", couponDO, loginUser);
-            throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
+            if (rows == 1) {
+                // 库存扣减成功才保存记录
+                couponRecordMapper.insert(couponRecordDO);
+            } else {
+                log.error("发放优惠券失败：{}，用户：{}", couponDO, loginUser);
+                throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
+            }
+        } finally {
+            lock.unlock();
+            log.info("领券接口分布式锁解锁成功:{}", Thread.currentThread().getId());
         }
         return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
     }

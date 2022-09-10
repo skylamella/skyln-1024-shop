@@ -39,6 +39,7 @@
         <tencentcloudapi.version>3.1.322</tencentcloudapi.version>
         <jwt.version>0.7.0</jwt.version>
         <joda.time.version>2.10.13</joda.time.version>
+        <redisson.version>3.10.1</redisson.version>
 
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
@@ -137,6 +138,12 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda.time.version}</version>
+            </dependency>
+            <!--redis分布式锁-->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
