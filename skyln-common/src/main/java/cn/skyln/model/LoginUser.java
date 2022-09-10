@@ -1,7 +1,9 @@
 package cn.skyln.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @Author: lamella
@@ -9,6 +11,8 @@ import lombok.Data;
  * @Description:
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class LoginUser {
     private Long id;
 

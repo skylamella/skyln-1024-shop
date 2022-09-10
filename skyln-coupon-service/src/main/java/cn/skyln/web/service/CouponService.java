@@ -3,6 +3,7 @@ package cn.skyln.web.service;
 import cn.skyln.enums.CouponCategoryEnum;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.CouponDO;
+import cn.skyln.web.model.REQ.NewUserCouponRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -33,4 +34,12 @@ public interface CouponService extends IService<CouponDO> {
      * @return JsonData
      */
     JsonData addCoupon(long couponId, CouponCategoryEnum promotion);
+
+    /**
+     * 新用户注册发放优惠券
+     *
+     * @param newUserCouponRequest 新用户注册领券对象
+     * @return JsonData
+     */
+    JsonData intiNewUserCoupon(NewUserCouponRequest newUserCouponRequest);
 }

@@ -15,6 +15,7 @@ import cn.skyln.web.mapper.CouponMapper;
 import cn.skyln.web.mapper.CouponRecordMapper;
 import cn.skyln.web.model.DO.CouponDO;
 import cn.skyln.web.model.DO.CouponRecordDO;
+import cn.skyln.web.model.REQ.NewUserCouponRequest;
 import cn.skyln.web.model.VO.CouponVO;
 import cn.skyln.web.service.CouponService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -127,6 +129,30 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
         } finally {
             lock.unlock();
             log.info("领券接口分布式锁解锁成功:{}", Thread.currentThread().getId());
+        }
+        return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
+    }
+
+    /**
+     * 新用户注册发放优惠券
+     *
+     * @param newUserCouponRequest 新用户注册领券对象
+     * @return JsonData
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Override
+    public JsonData intiNewUserCoupon(NewUserCouponRequest newUserCouponRequest) {
+        LoginUser loginUser = new LoginUser();
+        loginUser.setId(newUserCouponRequest.getUserId());
+        loginUser.setName(newUserCouponRequest.getUserName());
+        LoginInterceptor.threadLocal.set(loginUser);
+
+        // 查询新用户有哪些优惠券
+        List<CouponDO> couponDOList = couponMapper.selectList(new QueryWrapper<CouponDO>()
+                .eq("category", CouponCategoryEnum.NEW_USER.name()));
+        for(CouponDO couponDO : couponDOList){
+            // 幂等操作，需要加锁
+            this.addCoupon(couponDO.getId(), CouponCategoryEnum.NEW_USER);
         }
         return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
     }
