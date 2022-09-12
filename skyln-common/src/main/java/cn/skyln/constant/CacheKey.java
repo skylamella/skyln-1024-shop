@@ -17,7 +17,7 @@ public class CacheKey {
     public static final String DISTRIBUTED_LOCK_KEY = "lock:%s:%s";
 
     /**
-     *
+     * 购物车key，%s是占位符，是用户ID
      */
     public static final String CART_KEY = "cart:%s";
 }
