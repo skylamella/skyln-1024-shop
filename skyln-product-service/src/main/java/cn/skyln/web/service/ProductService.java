@@ -4,11 +4,12 @@ import cn.skyln.web.model.DO.ProductDO;
 import cn.skyln.web.model.VO.ProductDetailVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author skylamella
@@ -27,8 +28,17 @@ public interface ProductService extends IService<ProductDO> {
 
     /**
      * 根据ID查询商品详情
+     *
      * @param productId 商品ID
      * @return ProductDetailVO
      */
     ProductDetailVO findDetailById(long productId);
+
+    /**
+     * 根据ID批量查询商品
+     *
+     * @param productIdList ID列表
+     * @return 商品列表
+     */
+    List<ProductDetailVO> findProductsByIdBatch(List<Long> productIdList);
 }

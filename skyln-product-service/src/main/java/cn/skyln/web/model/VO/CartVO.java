@@ -55,7 +55,7 @@ public class CartVO {
      *
      * @return
      */
-    public BigDecimal getCartAmount() {
+    public BigDecimal getTotalCartAmount() {
         BigDecimal amount = new BigDecimal("0");
         if (Objects.nonNull(this.cartItemVOList)) {
             for (CartItemVO cartItemVO : cartItemVOList) {

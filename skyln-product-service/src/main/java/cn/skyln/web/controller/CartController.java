@@ -3,6 +3,7 @@ package cn.skyln.web.controller;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.REQ.CartItemRequest;
+import cn.skyln.web.model.VO.CartVO;
 import cn.skyln.web.service.CartService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,27 @@ public class CartController {
     @PostMapping("clear")
     public JsonData clearCart(){
         cartService.clear();
+        return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
+    }
+
+    @ApiOperation("查看我的购物车")
+    @GetMapping("my_cart")
+    public JsonData findMyCart(){
+        CartVO cartVO = cartService.getMyCart();
+        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS,cartVO);
+    }
+
+    @ApiOperation("删除购物项")
+    @PostMapping("delete/{product_id}")
+    public JsonData deleteItem(@ApiParam(value = "商品ID", required = true) @PathVariable("product_id") long productId){
+        cartService.deleteItem(productId);
+        return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
+    }
+
+    @ApiOperation("修改购物项")
+    @PostMapping("change")
+    public JsonData changeItem(@ApiParam(value = "加入购物车商品对象", required = true) @RequestBody CartItemRequest cartItemRequest){
+        cartService.changeItem(cartItemRequest);
         return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
     }
 

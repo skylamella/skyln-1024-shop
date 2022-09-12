@@ -7,6 +7,7 @@ import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.LoginUser;
 import cn.skyln.web.model.REQ.CartItemRequest;
 import cn.skyln.web.model.VO.CartItemVO;
+import cn.skyln.web.model.VO.CartVO;
 import cn.skyln.web.model.VO.ProductDetailVO;
 import cn.skyln.web.service.CartService;
 import cn.skyln.web.service.ProductService;
@@ -17,7 +18,12 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Author: lamella
@@ -52,7 +58,7 @@ public class CartServiceImpl implements CartService {
         if (StringUtils.isBlank(result)) {
             // 不存在商品，新增购物项
             CartItemVO cartItemVO = new CartItemVO();
-            ProductDetailVO productDetail = productService.findDetailById(cartItemRequest.getProductId());
+            ProductDetailVO productDetail = productService.findDetailById(productId);
             if (Objects.isNull(productDetail)) {
                 throw new BizException(BizCodeEnum.PRODUCT_NOT_EXIT);
             }
@@ -76,7 +82,106 @@ public class CartServiceImpl implements CartService {
     @Override
     public void clear() {
         String cartKey = getCartKey();
-        redisTemplate.delete(cartKey);
+        if (redisTemplate.hasKey(cartKey)) {
+            redisTemplate.delete(cartKey);
+        } else {
+            throw new BizException(BizCodeEnum.CART_NOT_EXIT);
+        }
+    }
+
+    /**
+     * 查看我的购物车
+     *
+     * @return CartVO
+     */
+    @Override
+    public CartVO getMyCart() {
+        // 获取全部购物项
+        List<CartItemVO> cartItemVOList = buildCartItemList(false);
+
+        // 封装成CartVO
+        CartVO cartVO = new CartVO();
+        cartVO.setCartItemVOList(cartItemVOList);
+        return cartVO;
+    }
+
+    /**
+     * 删除购物项
+     *
+     * @param productId 商品ID
+     */
+    @Override
+    public void deleteItem(long productId) {
+        // 获取购物车
+        BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
+        myCart.delete(String.valueOf(productId));
+    }
+
+    /**
+     * 修改购物项
+     *
+     * @param cartItemRequest 购物车商品对象
+     */
+    @Override
+    public void changeItem(CartItemRequest cartItemRequest) {
+        // 获取购物车
+        BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
+        Object object = myCart.get(String.valueOf(cartItemRequest.getProductId()));
+        if (Objects.isNull(object)) {
+            throw new BizException(BizCodeEnum.CART_NOT_EXIT);
+        }
+        CartItemVO cartItemVO = JSON.parseObject((String) object, CartItemVO.class);
+        if (cartItemRequest.getBuyNum() < 0) {
+            throw new BizException(BizCodeEnum.CART_UPD_NUM_FAIL);
+        } else if (cartItemRequest.getBuyNum() == 0) {
+            deleteItem(cartItemRequest.getProductId());
+        }
+        cartItemVO.setBuyNum(cartItemRequest.getBuyNum());
+        myCart.put(String.valueOf(cartItemRequest.getProductId()), JSON.toJSONString(cartItemVO));
+    }
+
+    /**
+     * 获取最新的购物项
+     *
+     * @param latestAmount 是否获取最新的价格
+     * @return 购物项列表
+     */
+    private List<CartItemVO> buildCartItemList(boolean latestAmount) {
+        // 获取购物车
+        BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
+        List<Object> itemList = myCart.values();
+        List<CartItemVO> cartItemVOList = new ArrayList<>();
+        // 拼接ID列表查询最新价格
+        List<Long> productIdList = new ArrayList<>();
+        for (Object item : itemList) {
+            CartItemVO cartItemVO = JSON.parseObject((String) item, CartItemVO.class);
+            cartItemVOList.add(cartItemVO);
+            productIdList.add(cartItemVO.getProductId());
+        }
+        if (latestAmount) {
+            setProductLatestAmount(cartItemVOList, productIdList);
+        }
+        return cartItemVOList;
+    }
+
+    /**
+     * 设置商品最新价格
+     *
+     * @param cartItemVOList 购物项列表
+     * @param productIdList  ID列表
+     */
+    private void setProductLatestAmount(List<CartItemVO> cartItemVOList, List<Long> productIdList) {
+        // 批量查询
+        List<ProductDetailVO> productDetailVOList = productService.findProductsByIdBatch(productIdList);
+        // 根据ID分组
+        Map<Long, ProductDetailVO> productDetailVOMap = productDetailVOList.stream().collect(Collectors.toMap(ProductDetailVO::getId, Function.identity()));
+
+        cartItemVOList.stream().forEach(item -> {
+            ProductDetailVO productDetailVO = productDetailVOMap.get(item.getProductId());
+            item.setAmount(productDetailVO.getAmount());
+            item.setProductTitle(productDetailVO.getTitle());
+            item.setProductImg(productDetailVO.getCoverImg());
+        });
     }
 
     /**

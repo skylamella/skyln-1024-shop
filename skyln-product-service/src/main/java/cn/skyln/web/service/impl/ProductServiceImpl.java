@@ -6,6 +6,7 @@ import cn.skyln.web.model.DO.ProductDO;
 import cn.skyln.web.model.VO.ProductDetailVO;
 import cn.skyln.web.model.VO.ProductListVO;
 import cn.skyln.web.service.ProductService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -48,10 +50,28 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, ProductDO> im
                         .collect(Collectors.toList()));
     }
 
+    /**
+     * 根据ID查询商品详情
+     *
+     * @param productId 商品ID
+     * @return ProductDetailVO
+     */
     @Override
     public ProductDetailVO findDetailById(long productId) {
         ProductDO productDO = productMapper.selectById(productId);
         return beanProcess(productDO);
+    }
+
+    /**
+     * 根据ID批量查询商品
+     *
+     * @param productIdList ID列表
+     * @return 商品列表
+     */
+    @Override
+    public List<ProductDetailVO> findProductsByIdBatch(List<Long> productIdList) {
+        List<ProductDO> productDOList = productMapper.selectList(new QueryWrapper<ProductDO>().in("id", productIdList));
+        return productDOList.stream().map(this::beanProcess).collect(Collectors.toList());
     }
 
     private ProductDetailVO beanProcess(ProductDO productDO) {
