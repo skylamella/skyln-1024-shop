@@ -7,7 +7,7 @@ package cn.skyln.constant;
  */
 public class CacheKey {
     /**
-     * %s是占位符，第一个是类型，第二个是接收号码
+     * 注册验证码，%s是占位符，第一个是类型，第二个是接收号码
      */
     public static final String CHECK_CODE_KEY = "code:%s:%s";
 
@@ -15,4 +15,9 @@ public class CacheKey {
      * %s是占位符，第一个是业务类型，第二个是内容ID
      */
     public static final String DISTRIBUTED_LOCK_KEY = "lock:%s:%s";
+
+    /**
+     *
+     */
+    public static final String CART_KEY = "cart:%s";
 }

@@ -21,10 +21,10 @@ public class BizExceptionHandle {
     public JsonData handler(Exception e) {
         if (e instanceof BizException) {
             BizException bizException = (BizException) e;
-            log.error("【业务异常】 {}", bizException.getMsg());
+            log.error("【业务异常】 {}", e);
             return JsonData.returnJson(bizException.getCode(), bizException.getMsg());
         } else {
-            log.error("【系统异常】 {}", e.getMessage());
+            log.error("【系统异常】 {}", e);
             return JsonData.returnJson(BizCodeEnum.SYSTEM_ERROR);
         }
     }

@@ -33,10 +33,10 @@ public class ProductListVO {
     /**
      * 老价格
      */
-    private BigDecimal oldPrice;
+    private BigDecimal oldAmount;
 
     /**
      * 新价格
      */
-    private BigDecimal price;
+    private BigDecimal amount;
 }

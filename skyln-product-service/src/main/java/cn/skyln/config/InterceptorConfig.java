@@ -43,6 +43,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
         List<String> addPathPatternsList = new ArrayList<>();
         addPathPatternsList.add("/api/*/banner/**");
         addPathPatternsList.add("/api/*/product/**");
+        addPathPatternsList.add("/api/*/cart/**");
         return addPathPatternsList;
     }
 

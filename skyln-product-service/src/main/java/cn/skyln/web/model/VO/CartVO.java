@@ -28,15 +28,15 @@ public class CartVO {
     /**
      * 整个购物车总价
      */
-    @JsonProperty("total_price")
-    private BigDecimal totalPrice;
+    @JsonProperty("total_cart_amount")
+    private BigDecimal totalCartAmount;
 
 
     /**
      * 实际支付总价
      */
-    @JsonProperty("real_pay_price")
-    private BigDecimal realPayPrice;
+    @JsonProperty("real_pay_amount")
+    private BigDecimal realPayAmount;
 
     /**
      * 总件数
@@ -55,7 +55,7 @@ public class CartVO {
      *
      * @return
      */
-    public BigDecimal getTotalPrice() {
+    public BigDecimal getCartAmount() {
         BigDecimal amount = new BigDecimal("0");
         if (Objects.nonNull(this.cartItemVOList)) {
             for (CartItemVO cartItemVO : cartItemVOList) {
@@ -71,7 +71,7 @@ public class CartVO {
      *
      * @return BigDecimal
      */
-    public BigDecimal getRealPayPrice() {
+    public BigDecimal getRealPayAmount() {
         // todo
         BigDecimal amount = new BigDecimal("0");
         if (Objects.nonNull(this.cartItemVOList)) {
