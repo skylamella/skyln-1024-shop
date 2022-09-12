@@ -30,4 +30,11 @@ public class CartController {
         return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
     }
 
+    @ApiOperation("清空购物车")
+    @PostMapping("clear")
+    public JsonData clearCart(){
+        cartService.clear();
+        return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
+    }
+
 }
