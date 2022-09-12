@@ -2,6 +2,7 @@ package cn.skyln.utils;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,6 +10,9 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -142,5 +146,18 @@ public class CommonUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Map<String, Object> getReturnPageMap(long total, long pages, List<Object> collect) {
+        Map<String, Object> pageMap = new HashMap<>(3);
+        pageMap.put("total_record", total);
+        pageMap.put("total_page", pages);
+        pageMap.put("current_data", collect);
+        return pageMap;
+    }
+
+    public static Object beanProcess(Object source, Object target) {
+        BeanUtils.copyProperties(source, target);
+        return target;
     }
 }

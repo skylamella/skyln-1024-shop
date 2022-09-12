@@ -98,6 +98,14 @@ public enum BizCodeEnum {
     BANNER_DEL_FAIL(250003,"删除轮播图失败"),
     BANNER_UPD_FAIL(250004,"更新轮播图失败"),
 
+    /**
+     * 商品相关
+     */
+    PRODUCT_NOT_EXIT(251001, "商品不存在。"),
+    PRODUCT_ADD_FAIL(251002,"新增商品失败"),
+    PRODUCT_DEL_FAIL(251003,"删除商品失败"),
+    PRODUCT_UPD_FAIL(251004,"更新商品失败"),
+
     // 各服务枚举结束
 
     // 系统枚举开始

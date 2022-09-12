@@ -2,7 +2,7 @@ package cn.skyln.web.service.impl;
 
 import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.LoginUser;
-import cn.skyln.utils.CouponUtils;
+import cn.skyln.utils.CommonUtils;
 import cn.skyln.web.mapper.CouponRecordMapper;
 import cn.skyln.web.model.DO.CouponRecordDO;
 import cn.skyln.web.model.VO.CouponRecordVO;
@@ -57,10 +57,10 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
                     .eq("use_state", useState)
                     .orderByDesc("create_time"));
         }
-        return CouponUtils.getReturnPageMap(recordDOPage.getTotal(),
+        return CommonUtils.getReturnPageMap(recordDOPage.getTotal(),
                 recordDOPage.getPages(),
                 recordDOPage.getRecords().stream().map(obj ->
-                                CouponUtils.beanProcess(obj, new CouponRecordVO()))
+                                CommonUtils.beanProcess(obj, new CouponRecordVO()))
                         .collect(Collectors.toList()));
     }
 

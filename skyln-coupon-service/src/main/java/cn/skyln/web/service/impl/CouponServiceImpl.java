@@ -9,7 +9,6 @@ import cn.skyln.exception.BizException;
 import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.LoginUser;
 import cn.skyln.utils.CommonUtils;
-import cn.skyln.utils.CouponUtils;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.mapper.CouponMapper;
 import cn.skyln.web.mapper.CouponRecordMapper;
@@ -72,10 +71,10 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
                 .eq("publish", CouponPublishEnum.PUBLISH)
                 .eq("category", CouponCategoryEnum.PROMOTION)
                 .orderByDesc("create_time"));
-        return CouponUtils.getReturnPageMap(couponDOIPage.getTotal(),
+        return CommonUtils.getReturnPageMap(couponDOIPage.getTotal(),
                 couponDOIPage.getPages(),
                 couponDOIPage.getRecords().stream().map(obj ->
-                                CouponUtils.beanProcess(obj, new CouponVO()))
+                                CommonUtils.beanProcess(obj, new CouponVO()))
                         .collect(Collectors.toList()));
     }
 
@@ -150,7 +149,7 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
         // 查询新用户有哪些优惠券
         List<CouponDO> couponDOList = couponMapper.selectList(new QueryWrapper<CouponDO>()
                 .eq("category", CouponCategoryEnum.NEW_USER.name()));
-        for(CouponDO couponDO : couponDOList){
+        for (CouponDO couponDO : couponDOList) {
             // 幂等操作，需要加锁
             this.addCoupon(couponDO.getId(), CouponCategoryEnum.NEW_USER);
         }

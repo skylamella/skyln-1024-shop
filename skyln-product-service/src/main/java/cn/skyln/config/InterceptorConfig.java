@@ -54,6 +54,10 @@ public class InterceptorConfig implements WebMvcConfigurer {
         List<String> excludePathPatternsList = new ArrayList<>();
         // 分页查询优惠券接口
         excludePathPatternsList.add("/api/*/banner/banner_list");
+        // 分页查询商品列表接口
+        excludePathPatternsList.add("/api/*/product/page_product");
+        // 查询商品详情接口
+        excludePathPatternsList.add("/api/*/product/detail/*");
         return excludePathPatternsList;
     }
 }
