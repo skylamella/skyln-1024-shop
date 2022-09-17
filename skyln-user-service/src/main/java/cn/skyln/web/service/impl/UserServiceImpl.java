@@ -19,7 +19,7 @@ import cn.skyln.web.service.NotifyService;
 import cn.skyln.web.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.seata.spring.annotation.GlobalTransactional;
+//import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +27,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -76,7 +78,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
      * @return JsonData
      */
     @Override
-    @GlobalTransactional
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+//    @GlobalTransactional
     public JsonData userRegister(UserRegisterRequest userRegisterRequest) {
         // 判断邮箱是否传入
         if (StringUtils.isEmpty(userRegisterRequest.getMail())) {
@@ -241,6 +244,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         }else {
             log.error("[发放新用户注册优惠券失败] 用户：{}，结果：{}", newUserCouponRequest, jsonData);
             // TODO 放入消息队列重新执行
+//            throw new RuntimeException(String.format("[发放新用户注册优惠券失败] 用户：%s，结果：%s", newUserCouponRequest, jsonData));
         }
     }
 }

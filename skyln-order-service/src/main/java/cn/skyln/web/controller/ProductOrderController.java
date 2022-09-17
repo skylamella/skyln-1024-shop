@@ -37,7 +37,7 @@ public class ProductOrderController {
     @Autowired
     private ProductOrderService productOrderService;
 
-    @ApiOperation("RPC-新用户注册领券接口")
+    @ApiOperation("用户下单")
     @PostMapping("/confirm")
     public void confirmOrder(@ApiParam(value = "确认订单对象", required = true) @RequestBody ConfirmOrderRequest confirmOrderRequest,
                              HttpServletResponse response) {
