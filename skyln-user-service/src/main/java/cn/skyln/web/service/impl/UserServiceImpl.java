@@ -19,6 +19,7 @@ import cn.skyln.web.service.NotifyService;
 import cn.skyln.web.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
@@ -75,6 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
      * @return JsonData
      */
     @Override
+    @GlobalTransactional
     public JsonData userRegister(UserRegisterRequest userRegisterRequest) {
         // 判断邮箱是否传入
         if (StringUtils.isEmpty(userRegisterRequest.getMail())) {
