@@ -47,9 +47,9 @@ public class MyBatisPlusGenerator {
         dsConfig.setDbType(DbType.MYSQL)
                 .setDriverName("com.mysql.cj.jdbc.Driver")
                 //TODO  TODO  TODO  TODO
-                .setUrl("jdbc:mysql://192.168.121.130:3306/skyln_product?useSSL=false")
+                .setUrl("jdbc:mysql://192.168.121.132:3307/skyln_product?useSSL=false")
                 .setUsername("root")
-                .setPassword("root");
+                .setPassword("P@ssw0rd");
         //3. 策略配置globalConfiguration中
         StrategyConfig stConfig = new StrategyConfig();
         //全局大写命名
@@ -62,7 +62,7 @@ public class MyBatisPlusGenerator {
                 .setRestControllerStyle(true)
                 // 生成的表, 支持多表一起生成，以数组形式填写
                 //TODO  TODO  TODO  TODO
-                .setInclude("banner", "product");
+                .setInclude("product_task");
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
         pkConfig.setParent("cn.skyln.web")
