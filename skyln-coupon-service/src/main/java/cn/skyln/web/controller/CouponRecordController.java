@@ -3,6 +3,7 @@ package cn.skyln.web.controller;
 
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
+import cn.skyln.web.model.REQ.LockCouponRecordRequest;
 import cn.skyln.web.model.VO.CouponRecordVO;
 import cn.skyln.web.service.CouponRecordService;
 import io.swagger.annotations.Api;
@@ -49,6 +50,12 @@ public class CouponRecordController {
             return JsonData.returnJson(BizCodeEnum.COUPON_NO_EXITS);
         }
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, couponRecordVO);
+    }
+
+    @ApiOperation("RPC-锁定优惠券记录")
+    @PostMapping("lock_records")
+    public JsonData lockCouponRecord(@ApiParam(value = "锁定优惠券请求对象", required = true) @RequestBody LockCouponRecordRequest lockCouponRecordRequest){
+        return couponRecordService.lockCouponRecord(lockCouponRecordRequest);
     }
 }
 

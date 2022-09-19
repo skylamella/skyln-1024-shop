@@ -1,6 +1,8 @@
 package cn.skyln.web.service;
 
+import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.CouponRecordDO;
+import cn.skyln.web.model.REQ.LockCouponRecordRequest;
 import cn.skyln.web.model.VO.CouponRecordVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -33,4 +35,12 @@ public interface CouponRecordService extends IService<CouponRecordDO> {
      * @return CouponRecordVO
      */
     CouponRecordVO getOneById(long couponRecordId);
+
+    /**
+     * 锁定优惠券
+     *
+     * @param lockCouponRecordRequest 锁定优惠券请求对象
+     * @return JsonData
+     */
+    JsonData lockCouponRecord(LockCouponRecordRequest lockCouponRecordRequest);
 }

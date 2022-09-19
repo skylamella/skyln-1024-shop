@@ -120,6 +120,12 @@
             <artifactId>redisson</artifactId>
         </dependency>
 
+        <!--引入AMQP-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
         <!--alibaba微服务整合分布式事务-->
 <!--        <dependency>-->
 <!--            <groupId>com.alibaba.cloud</groupId>-->
