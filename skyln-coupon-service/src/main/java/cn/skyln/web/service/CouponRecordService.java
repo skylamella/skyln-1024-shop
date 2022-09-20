@@ -1,5 +1,6 @@
 package cn.skyln.web.service;
 
+import cn.skyln.model.CouponRecordMessage;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.CouponRecordDO;
 import cn.skyln.web.model.REQ.LockCouponRecordRequest;
@@ -43,4 +44,11 @@ public interface CouponRecordService extends IService<CouponRecordDO> {
      * @return JsonData
      */
     JsonData lockCouponRecord(LockCouponRecordRequest lockCouponRecordRequest);
+
+    /**
+     *
+     * @param couponRecordMessage
+     * @return
+     */
+    boolean releaseCouponRecord(CouponRecordMessage couponRecordMessage);
 }
