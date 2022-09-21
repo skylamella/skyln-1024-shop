@@ -1,6 +1,8 @@
 package cn.skyln.web.service;
 
+import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.ProductDO;
+import cn.skyln.web.model.REQ.LockProductRequest;
 import cn.skyln.web.model.VO.ProductDetailVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -41,4 +43,12 @@ public interface ProductService extends IService<ProductDO> {
      * @return 商品列表
      */
     List<ProductDetailVO> findProductsByIdBatch(List<Long> productIdList);
+
+    /**
+     * 锁定商品库存
+     *
+     * @param lockProductRequest 商品锁定对象
+     * @return JsonData
+     */
+    JsonData lockProductStock(LockProductRequest lockProductRequest);
 }

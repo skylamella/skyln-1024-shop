@@ -5,8 +5,12 @@ import cn.skyln.web.mapper.ProductOrderMapper;
 import cn.skyln.web.model.DO.ProductOrderDO;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
 import cn.skyln.web.service.ProductOrderService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -18,6 +22,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, ProductOrderDO> implements ProductOrderService {
+
+    @Autowired
+    private ProductOrderMapper productOrderMapper;
 
     /**
      * 创建订单
@@ -42,5 +49,18 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
 
         return null;
+    }
+
+    /**
+     * 查询订单状态
+     *
+     * @param outTradeNo 订单号
+     * @return 订单状态
+     */
+    @Override
+    public String queryProductOrderState(String outTradeNo) {
+        ProductOrderDO productOrderDO = productOrderMapper.selectOne(new QueryWrapper<ProductOrderDO>()
+                .eq("out_trade_no", outTradeNo));
+        return Objects.isNull(productOrderDO) ? null : productOrderDO.getState();
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @Date: 2022/09/20/21:54
  * @Description:
  */
-@FeignClient(name = "skyln-coupon-service", fallback = ProductOrderFeignServiceFallback.class)
+@FeignClient(name = "skyln-order-service", fallback = ProductOrderFeignServiceFallback.class)
 public interface ProductOrderFeignService {
 
     /**

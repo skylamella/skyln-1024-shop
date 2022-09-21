@@ -46,6 +46,7 @@ public interface CouponRecordService extends IService<CouponRecordDO> {
     JsonData lockCouponRecord(LockCouponRecordRequest lockCouponRecordRequest);
 
     /**
+     * 解锁优惠券记录
      *
      * @param couponRecordMessage
      * @return

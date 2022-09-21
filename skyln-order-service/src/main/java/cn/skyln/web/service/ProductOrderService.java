@@ -22,4 +22,12 @@ public interface ProductOrderService extends IService<ProductOrderDO> {
      * @return JsonData
      */
     JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest);
+
+    /**
+     * 查询订单状态
+     *
+     * @param outTradeNo 订单号
+     * @return 订单状态
+     */
+    String queryProductOrderState(String outTradeNo);
 }

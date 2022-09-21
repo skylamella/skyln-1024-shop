@@ -1,6 +1,7 @@
 package cn.skyln.biz;
 
 import cn.skyln.CouponApplication;
+import cn.skyln.model.CouponRecordMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +26,13 @@ public class MQTest {
     @Test
     public void send() {
         rabbitTemplate.convertAndSend("coupon.event.exchange", "coupon.release.delay.routing.key", "5qeqweqw");
+    }
 
+    @Test
+    public void testCouponRecordRelease(){
+        CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
+        couponRecordMessage.setOutTradeNo("123456abc");
+        couponRecordMessage.setTaskId(1L);
+        rabbitTemplate.convertAndSend("coupon.event.exchange", "coupon.release.delay.routing.key", couponRecordMessage);
     }
 }

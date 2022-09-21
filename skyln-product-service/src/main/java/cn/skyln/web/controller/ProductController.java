@@ -3,6 +3,7 @@ package cn.skyln.web.controller;
 
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
+import cn.skyln.web.model.REQ.LockProductRequest;
 import cn.skyln.web.model.VO.ProductDetailVO;
 import cn.skyln.web.service.ProductService;
 import io.swagger.annotations.Api;
@@ -48,6 +49,12 @@ public class ProductController {
             return JsonData.returnJson(BizCodeEnum.PRODUCT_NOT_EXIT);
         }
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS,productDetailVO);
+    }
+
+    @ApiOperation("商品库存锁定")
+    @PostMapping("lock_products")
+    public JsonData lockProducts(@ApiParam(value = "商品库存锁定对象", required = true) @RequestBody LockProductRequest lockProductRequest){
+        return productService.lockProductStock(lockProductRequest);
     }
 
 }
