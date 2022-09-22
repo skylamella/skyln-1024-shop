@@ -32,7 +32,7 @@ public class ConfirmOrderRequest {
      * 传递ID，购买数量从购物车中读取
      */
     @ApiModelProperty(value = "优惠券ID", example = "[1]")
-    @JsonProperty("coupon_record_id")
+    @JsonProperty("product_id_list")
     private List<Long> productIdList;
 
     /**

@@ -1,6 +1,8 @@
 package cn.skyln.utils;
 
 import cn.skyln.enums.BizCodeEnum;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,5 +31,9 @@ public class JsonData {
 
     public static JsonData returnJson(BizCodeEnum bizCodeEnum, Object data) {
         return new JsonData(bizCodeEnum.getCode(), data, bizCodeEnum.getMsg());
+    }
+
+    public <T> T getData(TypeReference<T> typeReference) {
+        return JSON.parseObject(JSON.toJSONString(this.data), typeReference);
     }
 }
