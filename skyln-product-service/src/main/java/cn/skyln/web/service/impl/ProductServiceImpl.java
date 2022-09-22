@@ -1,8 +1,10 @@
 package cn.skyln.web.service.impl;
 
+import cn.skyln.config.RabbitMQConfig;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.enums.StockTaskStateEnum;
 import cn.skyln.exception.BizException;
+import cn.skyln.model.ProductMessage;
 import cn.skyln.utils.CommonUtils;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.mapper.ProductMapper;
@@ -18,6 +20,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +41,7 @@ import java.util.stream.Collectors;
  * @since 2022-09-10
  */
 @Service
+@Slf4j
 public class ProductServiceImpl extends ServiceImpl<ProductMapper, ProductDO> implements ProductService {
 
     @Autowired
@@ -44,6 +49,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, ProductDO> im
 
     @Autowired
     private ProductTaskMapper productTaskMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
     /**
      * 分页查询商品
@@ -121,7 +132,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, ProductDO> im
                 productTaskDO.setOutTradeNo(orderOutTradeNo);
                 productTaskDO.setCreateTime(new Date());
                 productTaskMapper.insert(productTaskDO);
-                // 发送MQ延迟消息 todo
+                // 发送MQ延迟消息
+                ProductMessage productMessage = new ProductMessage();
+                productMessage.setOutTradeNo(orderOutTradeNo);
+                productMessage.setTaskId(productTaskDO.getId());
+                rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(),
+                        rabbitMQConfig.getStockReleaseDelayRoutingKey(),
+                        productMessage);
+                log.info("商品库存锁定延迟消息发送成功：{}", productMessage);
             }
         }
         return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
