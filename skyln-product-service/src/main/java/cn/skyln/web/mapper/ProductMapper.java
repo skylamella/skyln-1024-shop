@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author skylamella
@@ -16,9 +16,19 @@ public interface ProductMapper extends BaseMapper<ProductDO> {
 
     /**
      * 锁定商品库存
+     *
      * @param productId 商品ID
-     * @param buyNum 购买数量
+     * @param buyNum    购买数量
      * @return 影响行数
      */
     int lockProductStock(@Param("productId") long productId, @Param("buyNum") int buyNum);
+
+    /**
+     * 恢复商品库存
+     *
+     * @param productId 商品ID
+     * @param buyNum    购买数量
+     * @return 影响行数
+     */
+    int unlockProductStock(@Param("productId") Long productId, @Param("buyNum") Integer buyNum);
 }

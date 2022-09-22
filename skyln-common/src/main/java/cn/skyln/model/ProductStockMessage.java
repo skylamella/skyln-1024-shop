@@ -8,7 +8,7 @@ import lombok.Data;
  * @Description:
  */
 @Data
-public class ProductMessage {
+public class ProductStockMessage {
 
     /**
      * 消息队列id

@@ -1,8 +1,7 @@
 package cn.skyln.biz;
 
 import cn.skyln.ProductApplication;
-import cn.skyln.config.RabbitMQConfig;
-import cn.skyln.model.CouponRecordMessage;
+import cn.skyln.model.ProductStockMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,10 +29,12 @@ public class MQTest {
     }
 
     @Test
-    public void testCouponRecordRelease(){
-        CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
-        couponRecordMessage.setOutTradeNo("123456abc");
-        couponRecordMessage.setTaskId(1L);
-        rabbitTemplate.convertAndSend("stock.event.exchange", "stock.release.delay.routing.key", couponRecordMessage);
+    public void testProductStockRecordRelease(){
+        ProductStockMessage productStockMessage = new ProductStockMessage();
+        productStockMessage.setOutTradeNo("123456abc");
+        productStockMessage.setTaskId(1L);
+        rabbitTemplate.convertAndSend("stock.event.exchange",
+                "stock.release.delay.routing.key",
+                productStockMessage);
     }
 }

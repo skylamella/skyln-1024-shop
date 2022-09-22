@@ -20,10 +20,19 @@
         id, title, cover_img, detail, old_amount, amount, stock, create_time, lock_stock
     </sql>
 
+    <!-- 锁定商品库存 -->
     <update id="lockProductStock">
         update product
         set lock_stock = lock_stock + #{buyNum}
         where id = #{productId}
           and (stock - lock_stock) >= #{buyNum}
+    </update>
+
+    <!-- 恢复商品库存 -->
+    <update id="unlockProductStock">
+        update product
+        set lock_stock = lock_stock - #{buyNum}
+        where id = #{productId}
+          and lock_stock >= #{buyNum}
     </update>
 </mapper>

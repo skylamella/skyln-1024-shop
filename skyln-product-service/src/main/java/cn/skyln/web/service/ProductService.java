@@ -1,5 +1,6 @@
 package cn.skyln.web.service;
 
+import cn.skyln.model.ProductStockMessage;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.ProductDO;
 import cn.skyln.web.model.REQ.LockProductRequest;
@@ -51,4 +52,12 @@ public interface ProductService extends IService<ProductDO> {
      * @return JsonData
      */
     JsonData lockProductStock(LockProductRequest lockProductRequest);
+
+    /**
+     * 释放商品库存
+     *
+     * @param productStockMessage
+     * @return
+     */
+    boolean releaseProductStockRecord(ProductStockMessage productStockMessage);
 }
