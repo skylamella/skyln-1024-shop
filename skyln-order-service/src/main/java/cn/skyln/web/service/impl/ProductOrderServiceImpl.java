@@ -6,10 +6,13 @@ import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.LoginUser;
 import cn.skyln.utils.CommonUtils;
 import cn.skyln.utils.JsonData;
+import cn.skyln.web.feignClient.ProductFeignService;
 import cn.skyln.web.feignClient.UserFeignService;
 import cn.skyln.web.mapper.ProductOrderMapper;
 import cn.skyln.web.model.DO.ProductOrderDO;
+import cn.skyln.web.model.DTO.CartDTO;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
+import cn.skyln.web.model.VO.OrderItemVO;
 import cn.skyln.web.model.VO.ProductOrderAddressVO;
 import cn.skyln.web.service.ProductOrderService;
 import com.alibaba.fastjson.TypeReference;
@@ -19,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,6 +42,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Autowired
     private UserFeignService userFeignService;
+
+    @Autowired
+    private ProductFeignService productFeignService;
 
     /**
      * 创建订单
@@ -62,9 +69,27 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String orderOutTradeNo = CommonUtils.getRandomCode(32);
+        // 获取用户的收货地址
         ProductOrderAddressVO addressVO = this.getUserAddress(confirmOrderRequest.getAddressId());
-        log.info("收货地址信息：{}",addressVO);
-        return null;
+        log.info("收货地址信息：{}", addressVO);
+        // 获取用户加入购物车的商品
+        List<Long> productIdList = confirmOrderRequest.getProductIdList();
+        CartDTO cartDTO = new CartDTO();
+        cartDTO.setProductIdList(productIdList);
+        cartDTO.setOrderOutTradeNo(orderOutTradeNo);
+        JsonData jsonData = productFeignService.confirmOrderCartItem(cartDTO);
+        if (jsonData.getCode() != 0) {
+            log.error("获取用户加入购物车的商品失败，msg：{}", jsonData);
+            return JsonData.returnJson(BizCodeEnum.SYSTEM_ERROR);
+        }
+        List<OrderItemVO> orderItemVOList = jsonData.getData(new TypeReference<>() {
+        });
+        if (Objects.isNull(orderItemVOList) || orderItemVOList.size() == 0) {
+            log.error("购物车商品项不存在，msg：{}", jsonData);
+            return JsonData.returnJson(BizCodeEnum.CART_NOT_EXIT);
+        }
+
+        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, addressVO);
     }
 
     /**

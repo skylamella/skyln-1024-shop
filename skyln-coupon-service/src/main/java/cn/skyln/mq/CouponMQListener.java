@@ -63,6 +63,7 @@ public class CouponMQListener {
         } catch (Exception e) {
             log.error("释放优惠券记录异常：{}，msg：{}", e, couponRecordMessage);
             channel.basicReject(msgTag, true);
+            lock.unlock();
         } finally {
             if(!flag){
                 // todo 持续消费失败则插入数据库

@@ -56,8 +56,8 @@ public interface ProductService extends IService<ProductDO> {
     /**
      * 释放商品库存
      *
-     * @param productStockMessage
-     * @return
+     * @param productStockMessage MQ消息体
+     * @return 清理结果
      */
     boolean releaseProductStockRecord(ProductStockMessage productStockMessage);
 }

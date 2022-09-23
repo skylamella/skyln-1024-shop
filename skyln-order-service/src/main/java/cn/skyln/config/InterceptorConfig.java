@@ -31,15 +31,16 @@ public class InterceptorConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    LoginInterceptor loginInterceptor(){
+    LoginInterceptor loginInterceptor() {
         return new LoginInterceptor();
     }
 
     /**
      * 配置拦截器拦截接口
+     *
      * @return 拦截器拦截接口
      */
-    private List<String> getAddPathPatternsList(){
+    private List<String> getAddPathPatternsList() {
         List<String> addPathPatternsList = new ArrayList<>();
         addPathPatternsList.add("/api/*/order/**");
         addPathPatternsList.add("/api/*/order_item/**");
@@ -48,9 +49,10 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     /**
      * 配置拦截器放行接口
+     *
      * @return 拦截器放行接口
      */
-    private List<String> getExcludePathPatternsList(){
+    private List<String> getExcludePathPatternsList() {
         List<String> excludePathPatternsList = new ArrayList<>();
         // RPC-订单状态查询
         excludePathPatternsList.add("/api/*/order/query_state");

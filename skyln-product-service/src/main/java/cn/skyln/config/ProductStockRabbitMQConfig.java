@@ -21,7 +21,7 @@ import java.util.Map;
  */
 @Configuration
 @Data
-public class RabbitMQConfig {
+public class ProductStockRabbitMQConfig {
 
     /**
      * 交换机

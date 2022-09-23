@@ -1,10 +1,16 @@
 package cn.skyln.web.service.impl;
 
+import cn.skyln.config.CartRabbitMQConfig;
 import cn.skyln.constant.CacheKey;
 import cn.skyln.enums.BizCodeEnum;
+import cn.skyln.enums.ProductOrderStateEnum;
 import cn.skyln.exception.BizException;
 import cn.skyln.interceptor.LoginInterceptor;
+import cn.skyln.model.CartMessage;
 import cn.skyln.model.LoginUser;
+import cn.skyln.utils.JsonData;
+import cn.skyln.web.feignClient.ProductOrderFeignService;
+import cn.skyln.web.model.DTO.CartDTO;
 import cn.skyln.web.model.REQ.CartItemRequest;
 import cn.skyln.web.model.VO.CartItemVO;
 import cn.skyln.web.model.VO.CartVO;
@@ -12,7 +18,9 @@ import cn.skyln.web.model.VO.ProductDetailVO;
 import cn.skyln.web.service.CartService;
 import cn.skyln.web.service.ProductService;
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,6 +39,7 @@ import java.util.stream.Collectors;
  * @Description:
  */
 @Service
+@Slf4j
 public class CartServiceImpl implements CartService {
 
     @Autowired
@@ -38,6 +47,15 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductOrderFeignService productOrderFeignService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private CartRabbitMQConfig cartRabbitMQConfig;
 
     /**
      * 添加商品到购物车
@@ -138,6 +156,64 @@ public class CartServiceImpl implements CartService {
         }
         cartItemVO.setBuyNum(cartItemRequest.getBuyNum());
         myCart.put(String.valueOf(cartItemRequest.getProductId()), JSON.toJSONString(cartItemVO));
+    }
+
+    @Override
+    public List<CartItemVO> confirmOrderCartItems(CartDTO cartDTO) {
+        // 获取购物车的全部购物项
+        List<CartItemVO> cartItemVOList = buildCartItemList(true);
+        List<Long> productIdList = cartDTO.getProductIdList();
+        // 根据需要的商品id
+        return cartItemVOList.stream().filter(obj -> {
+            if (productIdList.contains(obj.getProductId())) {
+                CartMessage cartMessage = new CartMessage();
+                cartMessage.setOutTradeNo(cartDTO.getOrderOutTradeNo());
+                cartMessage.setProductId(obj.getProductId());
+                rabbitTemplate.convertAndSend(cartRabbitMQConfig.getEventExchange(),
+                        cartRabbitMQConfig.getCartReleaseDelayRoutingKey(),
+                        cartMessage);
+                log.info("清空购物车-延迟消息发送成功：{}", cartMessage);
+                return true;
+            } else {
+                return false;
+            }
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 清空MQ中的购物车项
+     *
+     * @param cartMessage MQ消息体
+     * @return 清理结果
+     */
+    @Override
+    public boolean cleanCartRecord(CartMessage cartMessage) {
+        Long productId = cartMessage.getProductId();
+        String outTradeNo = cartMessage.getOutTradeNo();
+        JsonData jsonData = productOrderFeignService.queryProductOrderState(outTradeNo);
+        if (jsonData.getCode() == 0) {
+            // 正常响应，判断订单状态
+            String state = jsonData.getData().toString();
+            // 返回的数据不存在，返回给消息队列，重新投递
+            if (StringUtils.isBlank(state)) {
+                log.warn("订单状态不存在，返回给消息队列，重新投递：{}", cartMessage);
+                return false;
+            }
+            // 状态是NEW新建状态，返回给消息队列，重新投递
+            if (StringUtils.equalsIgnoreCase(ProductOrderStateEnum.NEW.name(), state)) {
+                log.warn("订单状态是NEW，返回给消息队列，重新投递：{}", cartMessage);
+                return false;
+            }
+            // 状态是已经支付
+            if (StringUtils.equalsIgnoreCase(ProductOrderStateEnum.PAY.name(), state)) {
+                // 清空购物车
+                this.deleteItem(productId);
+                log.info("订单已经支付，清空购物车对应购物项：{}", cartMessage);
+                return true;
+            }
+        }
+        log.warn("订单不存在，或者订单被取消，outTradeNo={}，消息：{}", outTradeNo, cartMessage);
+        return true;
     }
 
     /**
