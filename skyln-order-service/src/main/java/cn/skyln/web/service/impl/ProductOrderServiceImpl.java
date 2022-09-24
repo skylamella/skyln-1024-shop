@@ -161,7 +161,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     private ProductOrderDO setProductOrder(ConfirmOrderRequest confirmOrderRequest, LoginUser loginUser, String orderOutTradeNo, ProductOrderAddressVO addressVO) {
         ProductOrderDO productOrderDO = new ProductOrderDO();
         // 设置用户相关信息
-        productOrderDO.setUserId(Math.toIntExact(loginUser.getId()));
+        productOrderDO.setUserId(loginUser.getId());
         productOrderDO.setHeadImg(loginUser.getHeadImg());
         productOrderDO.setNickname(loginUser.getName());
 

@@ -71,7 +71,7 @@ public class ProductOrderDO implements Serializable {
     /**
      * ⽤户	id
      */
-    private Integer userId;
+    private Long userId;
 
     /**
      * 0表示未删除，	1表示已经删除
