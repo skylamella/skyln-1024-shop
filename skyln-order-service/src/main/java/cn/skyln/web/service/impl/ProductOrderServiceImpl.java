@@ -1,7 +1,6 @@
 package cn.skyln.web.service.impl;
 
-import cn.skyln.enums.BizCodeEnum;
-import cn.skyln.enums.CouponUseStateEnum;
+import cn.skyln.enums.*;
 import cn.skyln.exception.BizException;
 import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.LoginUser;
@@ -10,14 +9,17 @@ import cn.skyln.utils.JsonData;
 import cn.skyln.web.feignClient.CouponFeignService;
 import cn.skyln.web.feignClient.ProductFeignService;
 import cn.skyln.web.feignClient.UserFeignService;
+import cn.skyln.web.mapper.ProductOrderItemMapper;
 import cn.skyln.web.mapper.ProductOrderMapper;
 import cn.skyln.web.model.DO.ProductOrderDO;
+import cn.skyln.web.model.DO.ProductOrderItemDO;
 import cn.skyln.web.model.DTO.*;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
 import cn.skyln.web.model.VO.CouponRecordVO;
 import cn.skyln.web.model.VO.OrderItemVO;
 import cn.skyln.web.model.VO.ProductOrderAddressVO;
 import cn.skyln.web.service.ProductOrderService;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -45,6 +48,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Autowired
     private ProductOrderMapper productOrderMapper;
+
+    @Autowired
+    private ProductOrderItemMapper orderItemMapper;
 
     @Autowired
     private UserFeignService userFeignService;
@@ -104,9 +110,78 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         this.lockCouponRecords(confirmOrderRequest, orderOutTradeNo);
         // 锁定库存
         this.lockProductStocks(orderItemVOList, orderOutTradeNo);
-        // 创建订单和订单项 todo
+        // 创建订单
+        ProductOrderDO productOrderDO = this.setProductOrder(confirmOrderRequest, loginUser, orderOutTradeNo, addressVO);
+        // 创建订单项
+        this.setProductOrderItems(orderOutTradeNo, productOrderDO.getId(), orderItemVOList, loginUser);
+        // 发送延迟消息，用于自动关单 todo
         // 创建支付 todo
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, addressVO);
+    }
+
+    /**
+     * 新增订单项
+     *
+     * @param orderOutTradeNo 订单号
+     * @param productOrderId  订单ID
+     * @param orderItemVOList 订单项列表
+     * @param loginUser       当前登录用户
+     */
+    private void setProductOrderItems(String orderOutTradeNo, Long productOrderId, List<OrderItemVO> orderItemVOList, LoginUser loginUser) {
+        List<ProductOrderItemDO> list = orderItemVOList.stream().map(obj -> {
+            ProductOrderItemDO itemDO = new ProductOrderItemDO();
+            itemDO.setCreateTime(new Date());
+
+            itemDO.setProductId(obj.getProductId());
+            itemDO.setProductImg(obj.getProductImg());
+            itemDO.setProductOrderId(productOrderId);
+            itemDO.setProductName(obj.getProductTitle());
+            itemDO.setOutTradeNo(orderOutTradeNo);
+
+            itemDO.setBuyNum(obj.getBuyNum());
+            itemDO.setAmount(obj.getAmount());
+            itemDO.setTotalAmount(obj.getTotalAmount());
+            return itemDO;
+        }).collect(Collectors.toList());
+        int rows = orderItemMapper.insertBatch(list);
+        if(rows != list.size()){
+            log.error("新增订单项失败");
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_CART_ITEM_NOT_EXIST);
+        }
+    }
+
+    /**
+     * 创建订单
+     *
+     * @param confirmOrderRequest 确认订单对象
+     * @param loginUser           当前登录用户
+     * @param orderOutTradeNo     订单号
+     * @param addressVO           收货地址对象
+     */
+    private ProductOrderDO setProductOrder(ConfirmOrderRequest confirmOrderRequest, LoginUser loginUser, String orderOutTradeNo, ProductOrderAddressVO addressVO) {
+        ProductOrderDO productOrderDO = new ProductOrderDO();
+        // 设置用户相关信息
+        productOrderDO.setUserId(Math.toIntExact(loginUser.getId()));
+        productOrderDO.setHeadImg(loginUser.getHeadImg());
+        productOrderDO.setNickname(loginUser.getName());
+
+        // 设置订单相关信息
+        productOrderDO.setOutTradeNo(orderOutTradeNo);
+        productOrderDO.setCreateTime(new Date());
+        productOrderDO.setDel(0);
+        productOrderDO.setOrderType(ProductOrderTypeEnum.DAILY.name());
+
+        // 设置实际支付的价格
+        productOrderDO.setPayAmount(confirmOrderRequest.getRealPayAmount());
+        // 设置总价，即不使用优惠券的价格
+        productOrderDO.setTotalAmount(confirmOrderRequest.getTotalAmount());
+        productOrderDO.setState(ProductOrderStateEnum.NEW.name());
+        // todo 过滤支付方式
+        ProductOrderPayTypeEnum.valueOf(confirmOrderRequest.getPayType());
+        productOrderDO.setPayType(confirmOrderRequest.getPayType());
+        productOrderDO.setReceiverAddress(JSON.toJSONString(addressVO));
+        productOrderMapper.insert(productOrderDO);
+        return productOrderDO;
     }
 
     /**
