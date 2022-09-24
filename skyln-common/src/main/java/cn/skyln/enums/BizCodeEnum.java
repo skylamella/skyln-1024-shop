@@ -74,7 +74,7 @@ public enum BizCodeEnum {
      */
     ORDER_CONFIRM_COUPON_FAIL(230001,"创建订单-优惠券使用失败,不满足价格条件"),
     ORDER_CONFIRM_PRICE_FAIL(230002,"创建订单-验价失败"),
-    ORDER_CONFIRM_LOCK_PRODUCT_FAIL(230003,"创建订单-商品库存不足锁定失败"),
+    ORDER_CONFIRM_LOCK_PRODUCT_FAIL(230003,"创建订单-商品库存锁定失败"),
     ORDER_CONFIRM_ADD_STOCK_TASK_FAIL(230004,"创建订单-新增商品库存锁定任务"),
     ORDER_CONFIRM_TOKEN_NOT_EXIST(230008,"订单令牌缺少"),
     ORDER_CONFIRM_TOKEN_EQUAL_FAIL(230009,"订单令牌不正确"),

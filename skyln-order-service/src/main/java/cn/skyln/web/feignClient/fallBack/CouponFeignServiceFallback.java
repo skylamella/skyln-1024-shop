@@ -4,6 +4,7 @@ import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.feignClient.CouponFeignService;
 import cn.skyln.web.model.DTO.CouponDTO;
+import cn.skyln.web.model.DTO.LockCouponRecordDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,11 @@ import org.springframework.stereotype.Service;
 public class CouponFeignServiceFallback implements CouponFeignService {
     @Override
     public JsonData queryUserCouponRecord(CouponDTO couponDTO) {
+        return JsonData.returnJson(BizCodeEnum.SYSTEM_ERROR);
+    }
+
+    @Override
+    public JsonData lockCouponRecords(LockCouponRecordDTO lockCouponRecordDTO) {
         return JsonData.returnJson(BizCodeEnum.SYSTEM_ERROR);
     }
 }

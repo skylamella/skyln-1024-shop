@@ -12,8 +12,7 @@ import cn.skyln.web.feignClient.ProductFeignService;
 import cn.skyln.web.feignClient.UserFeignService;
 import cn.skyln.web.mapper.ProductOrderMapper;
 import cn.skyln.web.model.DO.ProductOrderDO;
-import cn.skyln.web.model.DTO.CartDTO;
-import cn.skyln.web.model.DTO.CouponDTO;
+import cn.skyln.web.model.DTO.*;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
 import cn.skyln.web.model.VO.CouponRecordVO;
 import cn.skyln.web.model.VO.OrderItemVO;
@@ -30,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -100,7 +100,56 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         log.info("获取到的购物项详情：{}", orderItemVOList);
         // 商品验价
         this.checkAmount(orderItemVOList, confirmOrderRequest, orderOutTradeNo);
+        // 锁定优惠券
+        this.lockCouponRecords(confirmOrderRequest, orderOutTradeNo);
+        // 锁定库存
+        this.lockProductStocks(orderItemVOList, orderOutTradeNo);
+        // 创建订单和订单项 todo
+        // 创建支付 todo
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, addressVO);
+    }
+
+    /**
+     * 锁定库存
+     *
+     * @param orderItemVOList 商品项列表
+     * @param orderOutTradeNo 订单号
+     */
+    private void lockProductStocks(List<OrderItemVO> orderItemVOList, String orderOutTradeNo) {
+        LockProductDTO lockProductDTO = new LockProductDTO();
+        lockProductDTO.setOrderOutTradeNo(orderOutTradeNo);
+        List<OrderItemDTO> orderItemList = orderItemVOList.stream().map(obj -> (OrderItemDTO) CommonUtils.beanProcess(obj, new OrderItemDTO())).collect(Collectors.toList());
+        lockProductDTO.setOrderItemList(orderItemList);
+        JsonData jsonData = productFeignService.lockProductStocks(lockProductDTO);
+        if (jsonData.getCode() != 0) {
+            log.error("商品库存锁定失败：{}", jsonData);
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_LOCK_PRODUCT_FAIL);
+        }
+    }
+
+    /**
+     * 锁定优惠券
+     *
+     * @param confirmOrderRequest 确认订单对象
+     * @param orderOutTradeNo     订单号
+     */
+    private void lockCouponRecords(ConfirmOrderRequest confirmOrderRequest, String orderOutTradeNo) {
+        List<Long> couponRecordIdList = confirmOrderRequest.getCouponRecordIdList();
+        if (Objects.nonNull(couponRecordIdList) && couponRecordIdList.size() > 0) {
+            for (Long id : couponRecordIdList) {
+                if (id <= 0) {
+                    throw new BizException(BizCodeEnum.COUPON_NO_EXITS);
+                }
+            }
+            LockCouponRecordDTO lockCouponRecordDTO = new LockCouponRecordDTO();
+            lockCouponRecordDTO.setLockCouponRecordIds(couponRecordIdList);
+            lockCouponRecordDTO.setOrderOutTradeNo(orderOutTradeNo);
+            JsonData jsonData = couponFeignService.lockCouponRecords(lockCouponRecordDTO);
+            if (jsonData.getCode() != 0) {
+                log.error("优惠券锁定失败：{}", jsonData);
+                throw new BizException(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
+            }
+        }
     }
 
     /**
@@ -148,7 +197,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     }
 
     /**
-     * 判断优惠券是否可用
+     * 获取优惠券并判断优惠券是否可用
      *
      * @param couponRecordIdList 优惠券ID列表
      * @return CouponRecordVO列表
@@ -182,7 +231,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
      * 判断优惠券是否可用
      *
      * @param couponRecordVOList CouponRecordVO列表
-     * @return
+     * @return 判断结果
      */
     private boolean couponAvailable(List<CouponRecordVO> couponRecordVOList) {
         boolean flag = true;

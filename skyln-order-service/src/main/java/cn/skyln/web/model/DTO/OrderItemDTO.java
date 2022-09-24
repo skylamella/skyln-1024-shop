@@ -1,4 +1,4 @@
-package cn.skyln.web.model.REQ;
+package cn.skyln.web.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
@@ -11,14 +11,11 @@ import lombok.Data;
  * @Description:
  */
 @Data
-@ApiModel(value = "商品子项", description = "商品子项")
-public class OrderItemRequest {
+public class OrderItemDTO {
 
-    @ApiModelProperty(value = "商品ID", example = "1")
     @JsonProperty("product_id")
     private long productId;
 
-    @ApiModelProperty(value = "购买数量", example = "1")
     @JsonProperty("buy_num")
     private int buyNum;
 }

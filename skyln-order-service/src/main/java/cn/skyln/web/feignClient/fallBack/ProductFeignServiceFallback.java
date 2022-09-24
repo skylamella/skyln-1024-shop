@@ -4,6 +4,7 @@ import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.feignClient.ProductFeignService;
 import cn.skyln.web.model.DTO.CartDTO;
+import cn.skyln.web.model.DTO.LockProductDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,11 @@ import java.util.List;
 public class ProductFeignServiceFallback implements ProductFeignService {
     @Override
     public JsonData confirmOrderCartItem(CartDTO cartDTO) {
+        return JsonData.returnJson(BizCodeEnum.SYSTEM_ERROR);
+    }
+
+    @Override
+    public JsonData lockProductStocks(LockProductDTO lockProductDTO) {
         return JsonData.returnJson(BizCodeEnum.SYSTEM_ERROR);
     }
 }

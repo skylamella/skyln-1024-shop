@@ -13,8 +13,8 @@ import cn.skyln.web.mapper.ProductMapper;
 import cn.skyln.web.mapper.ProductTaskMapper;
 import cn.skyln.web.model.DO.ProductDO;
 import cn.skyln.web.model.DO.ProductTaskDO;
-import cn.skyln.web.model.REQ.LockProductRequest;
-import cn.skyln.web.model.REQ.OrderItemRequest;
+import cn.skyln.web.model.DTO.LockProductDTO;
+import cn.skyln.web.model.DTO.OrderItemDTO;
 import cn.skyln.web.model.VO.ProductDetailVO;
 import cn.skyln.web.model.VO.ProductListVO;
 import cn.skyln.web.service.ProductService;
@@ -110,20 +110,20 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, ProductDO> im
      * 1）遍历商品，锁定每个商品购买数量
      * 2）每一次锁定的时候，都要发送延迟消息
      *
-     * @param lockProductRequest 商品锁定对象
+     * @param lockProductDTO 商品锁定对象
      * @return JsonData
      */
     @Override
-    public JsonData lockProductStock(LockProductRequest lockProductRequest) {
-        String orderOutTradeNo = lockProductRequest.getOrderOutTradeNo();
-        List<OrderItemRequest> orderItemList = lockProductRequest.getOrderItemList();
+    public JsonData lockProductStock(LockProductDTO lockProductDTO) {
+        String orderOutTradeNo = lockProductDTO.getOrderOutTradeNo();
+        List<OrderItemDTO> orderItemList = lockProductDTO.getOrderItemList();
         // 一行代码提取对象里面的ID并加入到集合里面
-        List<Long> productIdList = orderItemList.stream().map(OrderItemRequest::getProductId).collect(Collectors.toList());
+        List<Long> productIdList = orderItemList.stream().map(OrderItemDTO::getProductId).collect(Collectors.toList());
         // 批量查询
         List<ProductDetailVO> productDetailVOList = this.findProductsByIdBatch(productIdList);
         // 根据ID分组
         Map<Long, ProductDetailVO> productDetailVOMap = productDetailVOList.stream().collect(Collectors.toMap(ProductDetailVO::getId, Function.identity()));
-        for (OrderItemRequest item : orderItemList) {
+        for (OrderItemDTO item : orderItemList) {
             // 锁定商品记录
             int rows = productMapper.lockProductStock(item.getProductId(), item.getBuyNum());
             if (rows != 1) {

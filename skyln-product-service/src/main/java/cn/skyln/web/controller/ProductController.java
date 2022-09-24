@@ -3,7 +3,7 @@ package cn.skyln.web.controller;
 
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
-import cn.skyln.web.model.REQ.LockProductRequest;
+import cn.skyln.web.model.DTO.LockProductDTO;
 import cn.skyln.web.model.VO.ProductDetailVO;
 import cn.skyln.web.service.ProductService;
 import io.swagger.annotations.Api;
@@ -11,7 +11,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.Map;
 import java.util.Objects;
@@ -53,8 +52,8 @@ public class ProductController {
 
     @ApiOperation("商品库存锁定")
     @PostMapping("lock_products")
-    public JsonData lockProducts(@ApiParam(value = "商品库存锁定对象", required = true) @RequestBody LockProductRequest lockProductRequest){
-        return productService.lockProductStock(lockProductRequest);
+    public JsonData lockProducts(@ApiParam(value = "商品库存锁定对象", required = true) @RequestBody LockProductDTO lockProductDTO){
+        return productService.lockProductStock(lockProductDTO);
     }
 
 }

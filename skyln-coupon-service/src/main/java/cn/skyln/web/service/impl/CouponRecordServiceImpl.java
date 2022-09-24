@@ -222,22 +222,18 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
     public JsonData queryUserCouponRecord(CouponDTO couponDTO) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         List<Long> couponRecordIdList = couponDTO.getCouponRecordIdList();
-//        String orderOutTradeNo = couponDTO.getOrderOutTradeNo();
+        if (Objects.isNull(couponRecordIdList) || couponRecordIdList.size() == 0) {
+            return JsonData.returnJson(BizCodeEnum.COUPON_NO_EXITS);
+        }
+        for (Long id : couponRecordIdList) {
+            if (id <= 0) {
+                return JsonData.returnJson(BizCodeEnum.COUPON_NO_EXITS);
+            }
+        }
         List<CouponRecordDO> couponRecordDOList = couponRecordMapper.queryListInIds(couponRecordIdList, loginUser.getId());
         if (Objects.isNull(couponRecordDOList) || couponRecordDOList.size() == 0) {
             return JsonData.returnJson(BizCodeEnum.COUPON_NO_EXITS);
         }
-//        LockCouponRecordRequest lockCouponRecordRequest = new LockCouponRecordRequest();
-//        lockCouponRecordRequest.setLockCouponRecordIds(couponRecordIdList);
-//        lockCouponRecordRequest.setOrderOutTradeNo(orderOutTradeNo);
-//        try {
-//            JsonData jsonData = this.lockCouponRecord(lockCouponRecordRequest);
-//            if (Objects.isNull(jsonData) || jsonData.getCode() != 0) {
-//                return JsonData.returnJson(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
-//            }
-//        } catch (Exception e) {
-//            return JsonData.returnJson(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
-//        }
         List<CouponRecordVO> couponRecordVOList = couponRecordDOList.stream().map(obj -> {
             CouponRecordVO couponRecordVO = new CouponRecordVO();
             BeanUtils.copyProperties(obj, couponRecordVO);

@@ -3,6 +3,7 @@ package cn.skyln.web.feignClient;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.feignClient.fallBack.CouponFeignServiceFallback;
 import cn.skyln.web.model.DTO.CouponDTO;
+import cn.skyln.web.model.DTO.LockCouponRecordDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,4 +24,13 @@ public interface CouponFeignService {
      */
     @PostMapping("/api/v1/coupon_record/detail/list")
     JsonData queryUserCouponRecord(@RequestBody CouponDTO couponDTO);
+
+    /**
+     * 锁定优惠券
+     *
+     * @param lockCouponRecordDTO 锁定优惠券对象
+     * @return JsonData
+     */
+    @PostMapping("/api/v1/coupon_record/lock_records")
+    JsonData lockCouponRecords(@RequestBody LockCouponRecordDTO lockCouponRecordDTO);
 }
