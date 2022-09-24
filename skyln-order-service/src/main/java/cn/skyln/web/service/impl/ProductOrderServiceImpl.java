@@ -1,9 +1,11 @@
 package cn.skyln.web.service.impl;
 
+import cn.skyln.config.RabbitMQConfig;
 import cn.skyln.enums.*;
 import cn.skyln.exception.BizException;
 import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.LoginUser;
+import cn.skyln.model.OrderCloseMessage;
 import cn.skyln.utils.CommonUtils;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.feignClient.CouponFeignService;
@@ -25,6 +27,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +63,12 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
     /**
      * 创建订单
@@ -114,7 +123,13 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         ProductOrderDO productOrderDO = this.setProductOrder(confirmOrderRequest, loginUser, orderOutTradeNo, addressVO);
         // 创建订单项
         this.setProductOrderItems(orderOutTradeNo, productOrderDO.getId(), orderItemVOList, loginUser);
-        // 发送延迟消息，用于自动关单 todo
+        // 发送延迟消息，用于自动关单
+        OrderCloseMessage orderCloseMessage = new OrderCloseMessage();
+        orderCloseMessage.setOutTradeNo(orderOutTradeNo);
+        rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(),
+                rabbitMQConfig.getOrderCloseDelayRoutingKey(),
+                orderCloseMessage);
+        log.info("自动关单延迟消息发送成功：{}", orderCloseMessage);
         // 创建支付 todo
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, addressVO);
     }
@@ -144,7 +159,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             return itemDO;
         }).collect(Collectors.toList());
         int rows = orderItemMapper.insertBatch(list);
-        if(rows != list.size()){
+        if (rows != list.size()) {
             log.error("新增订单项失败");
             throw new BizException(BizCodeEnum.ORDER_CONFIRM_CART_ITEM_NOT_EXIST);
         }
@@ -355,5 +370,41 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         ProductOrderDO productOrderDO = productOrderMapper.selectOne(new QueryWrapper<ProductOrderDO>()
                 .eq("out_trade_no", outTradeNo));
         return Objects.isNull(productOrderDO) ? null : productOrderDO.getState();
+    }
+
+    /**
+     * 延迟自动关单
+     *
+     * @param orderCloseMessage MQ消息体
+     * @return 关单结果
+     */
+    @Override
+    public boolean delayCloseProductOrder(OrderCloseMessage orderCloseMessage) {
+        String outTradeNo = orderCloseMessage.getOutTradeNo();
+        ProductOrderDO productOrderDO = productOrderMapper.selectOne(new QueryWrapper<ProductOrderDO>()
+                .eq("out_trade_no", outTradeNo));
+        if (Objects.isNull(productOrderDO)) {
+            log.info("订单不存在：{}", orderCloseMessage);
+            return true;
+        }
+        // 状态是已经支付
+        if (StringUtils.equalsIgnoreCase(ProductOrderStateEnum.PAY.name(), productOrderDO.getState())) {
+            // 修改task状态为finish
+            log.info("订单已经支付：{}", orderCloseMessage);
+            return true;
+        }
+
+        // 向第三方支付查询订单是否真的未支付 todo
+        String payResult = "";
+        // 结果为空，则未支付成功，本地取消订单
+        if (StringUtils.isBlank(payResult)) {
+            productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.NEW.name(), ProductOrderStateEnum.CANCEL.name());
+            log.info("结果为空，则未支付成功，本地取消订单：{}", orderCloseMessage);
+        } else {
+            // 支付成功，主动把订单状态改成已支付，造成该情况的原因可能是支付通道回调有问题
+            productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.NEW.name(), ProductOrderStateEnum.PAY.name());
+            log.warn("支付成功，主动把订单状态改成已支付，造成该情况的原因可能是支付通道回调有问题：{}", orderCloseMessage);
+        }
+        return true;
     }
 }

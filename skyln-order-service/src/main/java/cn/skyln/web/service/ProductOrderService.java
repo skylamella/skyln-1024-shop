@@ -1,5 +1,6 @@
 package cn.skyln.web.service;
 
+import cn.skyln.model.OrderCloseMessage;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.ProductOrderDO;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
@@ -30,4 +31,12 @@ public interface ProductOrderService extends IService<ProductOrderDO> {
      * @return 订单状态
      */
     String queryProductOrderState(String outTradeNo);
+
+    /**
+     * 延迟自动关单
+     *
+     * @param orderCloseMessage MQ消息体
+     * @return 关单结果
+     */
+    boolean delayCloseProductOrder(OrderCloseMessage orderCloseMessage);
 }
