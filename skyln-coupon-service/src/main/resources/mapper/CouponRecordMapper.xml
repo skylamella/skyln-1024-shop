@@ -30,7 +30,7 @@
         where user_id = #{userId}
         and use_state = 'NEW'
         and id in
-        <foreach collection="lockCouponRecordIds" index="index" item="id" separator="," open="{" close=")">
+        <foreach collection="lockCouponRecordIds" index="index" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
     </update>
@@ -41,4 +41,14 @@
         set use_state=#{useState}
         where id = #{couponRecordId}
     </update>
+
+    <!-- 根据ID列表查询优惠券详情 -->
+    <select id="queryListInIds" resultMap="BaseResultMap">
+        select * from coupon_record
+        where user_id = #{userId}
+        and id in
+        <foreach collection="couponRecordIdList" index="index" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

@@ -3,7 +3,7 @@ package cn.skyln.web.controller;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.enums.CouponCategoryEnum;
 import cn.skyln.utils.JsonData;
-import cn.skyln.web.model.REQ.NewUserCouponRequest;
+import cn.skyln.web.model.DTO.NewUserCouponDTO;
 import cn.skyln.web.service.CouponService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,8 +46,8 @@ public class CouponController {
 
     @ApiOperation("RPC-新用户注册领券接口")
     @PostMapping("/add/new_user")
-    public JsonData addNewUserCoupon(@ApiParam(value = "新用户注册领券对象", required = true) @RequestBody NewUserCouponRequest newUserCouponRequest){
-        return couponService.intiNewUserCoupon(newUserCouponRequest);
+    public JsonData addNewUserCoupon(@ApiParam(value = "新用户注册领券对象", required = true) @RequestBody NewUserCouponDTO newUserCouponDTO){
+        return couponService.intiNewUserCoupon(newUserCouponDTO);
     }
 }
 

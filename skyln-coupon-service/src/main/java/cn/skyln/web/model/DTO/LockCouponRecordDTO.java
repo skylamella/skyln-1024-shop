@@ -1,4 +1,4 @@
-package cn.skyln.web.model.REQ;
+package cn.skyln.web.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @ApiModel(value = "锁定优惠券请求对象", description = "锁定优惠券请求对象")
-public class LockCouponRecordRequest {
+public class LockCouponRecordDTO {
 
     @ApiModelProperty(value = "优惠券记录ID列表", example = "[1,2]")
     @JsonProperty("lock_coupon_record_ids")

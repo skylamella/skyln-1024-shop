@@ -10,11 +10,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * @Author: lamella
@@ -26,6 +22,7 @@ public class CommonUtils {
 
     /**
      * MD5加密字符串
+     *
      * @param oldStr 待加密字符串
      * @return 加密后字符串
      */
@@ -47,6 +44,7 @@ public class CommonUtils {
 
     /**
      * 获取完整URL
+     *
      * @param request HttpServletRequest
      * @return 完整URL
      */
@@ -61,6 +59,7 @@ public class CommonUtils {
 
     /**
      * 获取一个随机整数
+     *
      * @param maxNum 随机整数边界
      * @return 随机整数
      */
@@ -80,6 +79,7 @@ public class CommonUtils {
 
     /**
      * 获取访问用户的IP地址
+     *
      * @param request HttpServletRequest
      * @return 访问用户的IP地址
      */
@@ -116,6 +116,7 @@ public class CommonUtils {
 
     /**
      * 生成随机字符串
+     *
      * @param length 随机字符串长度
      * @return 随机字符串
      */
@@ -127,7 +128,7 @@ public class CommonUtils {
         return sb.toString();
     }
 
-    public static long getCurrentTimeStamp(){
+    public static long getCurrentTimeStamp() {
         return System.currentTimeMillis();
     }
 

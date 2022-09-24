@@ -34,4 +34,13 @@ public interface CouponRecordMapper extends BaseMapper<CouponRecordDO> {
      * @return 影响行数
      */
     int updateState(@Param("couponRecordId") Long couponRecordId, @Param("useState") String useState);
+
+    /**
+     * 根据ID列表查询优惠券详情
+     *
+     * @param couponRecordIdList 优惠券ID列表
+     * @param userId             用户ID
+     * @return 结果list
+     */
+    List<CouponRecordDO> queryListInIds(@Param("couponRecordIdList") List<Long> couponRecordIdList, @Param("userId") Long userId);
 }

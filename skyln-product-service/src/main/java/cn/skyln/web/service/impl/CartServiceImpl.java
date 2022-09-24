@@ -1,6 +1,6 @@
 package cn.skyln.web.service.impl;
 
-import cn.skyln.config.CartRabbitMQConfig;
+import cn.skyln.config.RabbitMQConfig;
 import cn.skyln.constant.CacheKey;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.enums.ProductOrderStateEnum;
@@ -55,7 +55,7 @@ public class CartServiceImpl implements CartService {
     private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    private CartRabbitMQConfig cartRabbitMQConfig;
+    private RabbitMQConfig rabbitMQConfig;
 
     /**
      * 添加商品到购物车
@@ -169,8 +169,8 @@ public class CartServiceImpl implements CartService {
                 CartMessage cartMessage = new CartMessage();
                 cartMessage.setOutTradeNo(cartDTO.getOrderOutTradeNo());
                 cartMessage.setProductId(obj.getProductId());
-                rabbitTemplate.convertAndSend(cartRabbitMQConfig.getEventExchange(),
-                        cartRabbitMQConfig.getCartReleaseDelayRoutingKey(),
+                rabbitTemplate.convertAndSend(rabbitMQConfig.getCartEventExchange(),
+                        rabbitMQConfig.getCartReleaseDelayRoutingKey(),
                         cartMessage);
                 log.info("清空购物车-延迟消息发送成功：{}", cartMessage);
                 return true;

@@ -61,7 +61,8 @@ public enum BizCodeEnum {
      */
     COUPON_CONDITION_ERROR(220001,"优惠券条件错误"),
     COUPON_UNAVAILABLE(220002,"没有可用的优惠券"),
-    COUPON_NO_EXITS(220003,"优惠券不存在"),
+    COUPON_CANNOT_USED(220003,"存在不可用的优惠券"),
+    COUPON_NO_EXITS(220004,"优惠券不存在"),
     COUPON_NO_STOCK(220005,"优惠券库存不足"),
     COUPON_OUT_OF_LIMIT(220006,"优惠券领取超过限制次数"),
     COUPON_OUT_OF_TIME(220007,"优惠券不在领取时间范围"),

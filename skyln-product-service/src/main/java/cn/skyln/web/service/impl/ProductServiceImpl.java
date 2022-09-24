@@ -1,6 +1,6 @@
 package cn.skyln.web.service.impl;
 
-import cn.skyln.config.ProductStockRabbitMQConfig;
+import cn.skyln.config.RabbitMQConfig;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.enums.ProductOrderStateEnum;
 import cn.skyln.enums.StockTaskStateEnum;
@@ -58,7 +58,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, ProductDO> im
     private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    private ProductStockRabbitMQConfig productStockRabbitMQConfig;
+    private RabbitMQConfig rabbitMQConfig;
 
     @Autowired
     private ProductOrderFeignService productOrderFeignService;
@@ -143,8 +143,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, ProductDO> im
                 ProductStockMessage productStockMessage = new ProductStockMessage();
                 productStockMessage.setOutTradeNo(orderOutTradeNo);
                 productStockMessage.setTaskId(productTaskDO.getId());
-                rabbitTemplate.convertAndSend(productStockRabbitMQConfig.getEventExchange(),
-                        productStockRabbitMQConfig.getStockReleaseDelayRoutingKey(),
+                rabbitTemplate.convertAndSend(rabbitMQConfig.getStockEventExchange(),
+                        rabbitMQConfig.getStockReleaseDelayRoutingKey(),
                         productStockMessage);
                 log.info("商品库存锁定延迟消息发送成功：{}", productStockMessage);
             }

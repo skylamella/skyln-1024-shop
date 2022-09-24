@@ -14,7 +14,7 @@ import cn.skyln.web.mapper.CouponMapper;
 import cn.skyln.web.mapper.CouponRecordMapper;
 import cn.skyln.web.model.DO.CouponDO;
 import cn.skyln.web.model.DO.CouponRecordDO;
-import cn.skyln.web.model.REQ.NewUserCouponRequest;
+import cn.skyln.web.model.DTO.NewUserCouponDTO;
 import cn.skyln.web.model.VO.CouponVO;
 import cn.skyln.web.service.CouponService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -135,15 +135,15 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, CouponDO> imple
     /**
      * 新用户注册发放优惠券
      *
-     * @param newUserCouponRequest 新用户注册领券对象
+     * @param newUserCouponDTO 新用户注册领券对象
      * @return JsonData
      */
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     @Override
-    public JsonData intiNewUserCoupon(NewUserCouponRequest newUserCouponRequest) {
+    public JsonData intiNewUserCoupon(NewUserCouponDTO newUserCouponDTO) {
         LoginUser loginUser = new LoginUser();
-        loginUser.setId(newUserCouponRequest.getUserId());
-        loginUser.setName(newUserCouponRequest.getUserName());
+        loginUser.setId(newUserCouponDTO.getUserId());
+        loginUser.setName(newUserCouponDTO.getUserName());
         LoginInterceptor.threadLocal.set(loginUser);
 
         // 查询新用户有哪些优惠券

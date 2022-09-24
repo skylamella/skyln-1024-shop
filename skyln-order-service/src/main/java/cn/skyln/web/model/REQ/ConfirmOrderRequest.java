@@ -22,9 +22,9 @@ public class ConfirmOrderRequest {
      * <p>
      * 注意：如果传空或者小于0，则不用优惠券
      */
-    @ApiModelProperty(value = "优惠券ID", example = "-1")
-    @JsonProperty("coupon_record_id")
-    private Long couponRecordId;
+    @ApiModelProperty(value = "优惠券ID", example = "[1]")
+    @JsonProperty("coupon_record_id_list")
+    private List<Long> couponRecordIdList;
 
     /**
      * 最终购买的商品列表

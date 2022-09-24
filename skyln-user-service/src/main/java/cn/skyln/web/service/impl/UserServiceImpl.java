@@ -11,7 +11,7 @@ import cn.skyln.utils.RsaUtils;
 import cn.skyln.web.feignClient.CouponFeignService;
 import cn.skyln.web.mapper.UserMapper;
 import cn.skyln.web.model.DO.UserDO;
-import cn.skyln.web.model.REQ.NewUserCouponRequest;
+import cn.skyln.web.model.DTO.NewUserCouponDTO;
 import cn.skyln.web.model.REQ.UserLoginRequest;
 import cn.skyln.web.model.REQ.UserRegisterRequest;
 import cn.skyln.web.model.VO.UserVO;
@@ -237,12 +237,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     }
 
     private void userRegisterInitTask(UserDO userDO) {
-        NewUserCouponRequest newUserCouponRequest = NewUserCouponRequest.builder().userId(userDO.getId()).userName(userDO.getName()).build();
-        JsonData jsonData = couponFeignService.intiNewUserCoupon(newUserCouponRequest);
+        NewUserCouponDTO newUserCouponDTO = NewUserCouponDTO.builder().userId(userDO.getId()).userName(userDO.getName()).build();
+        JsonData jsonData = couponFeignService.intiNewUserCoupon(newUserCouponDTO);
         if(jsonData.getCode() == 0){
-            log.info("[发放新用户注册优惠券成功] 用户：{}，结果：{}", newUserCouponRequest, jsonData);
+            log.info("[发放新用户注册优惠券成功] 用户：{}，结果：{}", newUserCouponDTO, jsonData);
         }else {
-            log.error("[发放新用户注册优惠券失败] 用户：{}，结果：{}", newUserCouponRequest, jsonData);
+            log.error("[发放新用户注册优惠券失败] 用户：{}，结果：{}", newUserCouponDTO, jsonData);
             // TODO 放入消息队列重新执行
 //            throw new RuntimeException(String.format("[发放新用户注册优惠券失败] 用户：%s，结果：%s", newUserCouponRequest, jsonData));
         }

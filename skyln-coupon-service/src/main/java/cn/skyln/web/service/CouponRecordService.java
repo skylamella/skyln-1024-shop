@@ -3,7 +3,8 @@ package cn.skyln.web.service;
 import cn.skyln.model.CouponRecordMessage;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.CouponRecordDO;
-import cn.skyln.web.model.REQ.LockCouponRecordRequest;
+import cn.skyln.web.model.DTO.CouponDTO;
+import cn.skyln.web.model.DTO.LockCouponRecordDTO;
 import cn.skyln.web.model.VO.CouponRecordVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -40,16 +41,24 @@ public interface CouponRecordService extends IService<CouponRecordDO> {
     /**
      * 锁定优惠券
      *
-     * @param lockCouponRecordRequest 锁定优惠券请求对象
+     * @param lockCouponRecordDTO 锁定优惠券请求对象
      * @return JsonData
      */
-    JsonData lockCouponRecord(LockCouponRecordRequest lockCouponRecordRequest);
+    JsonData lockCouponRecord(LockCouponRecordDTO lockCouponRecordDTO);
 
     /**
      * 解锁优惠券记录
      *
-     * @param couponRecordMessage
-     * @return
+     * @param couponRecordMessage CouponRecordMessage
+     * @return 解锁状态
      */
     boolean releaseCouponRecord(CouponRecordMessage couponRecordMessage);
+
+    /**
+     * 根据ID列表获取优惠券详情并锁定优惠券
+     *
+     * @param couponDTO CouponDTO
+     * @return JsonData
+     */
+    JsonData queryUserCouponRecord(CouponDTO couponDTO);
 }

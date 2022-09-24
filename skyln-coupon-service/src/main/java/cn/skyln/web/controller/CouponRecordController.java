@@ -3,17 +3,16 @@ package cn.skyln.web.controller;
 
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
-import cn.skyln.web.model.REQ.LockCouponRecordRequest;
+import cn.skyln.web.model.DTO.CouponDTO;
+import cn.skyln.web.model.DTO.LockCouponRecordDTO;
 import cn.skyln.web.model.VO.CouponRecordVO;
 import cn.skyln.web.service.CouponRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,8 +53,14 @@ public class CouponRecordController {
 
     @ApiOperation("RPC-锁定优惠券记录")
     @PostMapping("lock_records")
-    public JsonData lockCouponRecord(@ApiParam(value = "锁定优惠券请求对象", required = true) @RequestBody LockCouponRecordRequest lockCouponRecordRequest){
-        return couponRecordService.lockCouponRecord(lockCouponRecordRequest);
+    public JsonData lockCouponRecord(@ApiParam(value = "锁定优惠券请求对象", required = true) @RequestBody LockCouponRecordDTO lockCouponRecordDTO){
+        return couponRecordService.lockCouponRecord(lockCouponRecordDTO);
+    }
+
+    @ApiOperation("RPC-锁定优惠券记录")
+    @PostMapping("detail/list")
+    public JsonData queryUserCouponRecord(@ApiParam(value = "锁定优惠券请求对象", required = true) @RequestBody CouponDTO couponDTO){
+        return couponRecordService.queryUserCouponRecord(couponDTO);
     }
 }
 

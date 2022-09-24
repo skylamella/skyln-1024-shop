@@ -16,7 +16,8 @@ import cn.skyln.web.mapper.CouponRecordMapper;
 import cn.skyln.web.mapper.CouponTaskMapper;
 import cn.skyln.web.model.DO.CouponRecordDO;
 import cn.skyln.web.model.DO.CouponTaskDO;
-import cn.skyln.web.model.REQ.LockCouponRecordRequest;
+import cn.skyln.web.model.DTO.CouponDTO;
+import cn.skyln.web.model.DTO.LockCouponRecordDTO;
 import cn.skyln.web.model.VO.CouponRecordVO;
 import cn.skyln.web.service.CouponRecordService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -118,14 +119,14 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
     /**
      * 锁定优惠券
      *
-     * @param lockCouponRecordRequest 锁定优惠券请求对象
+     * @param lockCouponRecordDTO 锁定优惠券请求对象
      * @return JsonData
      */
     @Override
-    public JsonData lockCouponRecord(LockCouponRecordRequest lockCouponRecordRequest) {
+    public JsonData lockCouponRecord(LockCouponRecordDTO lockCouponRecordDTO) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        List<Long> lockCouponRecordIds = lockCouponRecordRequest.getLockCouponRecordIds();
-        String orderOutTradeNo = lockCouponRecordRequest.getOrderOutTradeNo();
+        List<Long> lockCouponRecordIds = lockCouponRecordDTO.getLockCouponRecordIds();
+        String orderOutTradeNo = lockCouponRecordDTO.getOrderOutTradeNo();
 
         int updateRows = couponRecordMapper.lockUseStateBatch(loginUser.getId(), CouponUseStateEnum.USED.name(), lockCouponRecordIds);
         log.info("优惠券记录锁定updateRows={}", updateRows);
@@ -215,5 +216,34 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
             log.warn("工作单状态不是LOCK，state={}，消息：{}", couponTaskDO.getLockState(), couponRecordMessage);
         }
         return true;
+    }
+
+    @Override
+    public JsonData queryUserCouponRecord(CouponDTO couponDTO) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        List<Long> couponRecordIdList = couponDTO.getCouponRecordIdList();
+//        String orderOutTradeNo = couponDTO.getOrderOutTradeNo();
+        List<CouponRecordDO> couponRecordDOList = couponRecordMapper.queryListInIds(couponRecordIdList, loginUser.getId());
+        if (Objects.isNull(couponRecordDOList) || couponRecordDOList.size() == 0) {
+            return JsonData.returnJson(BizCodeEnum.COUPON_NO_EXITS);
+        }
+//        LockCouponRecordRequest lockCouponRecordRequest = new LockCouponRecordRequest();
+//        lockCouponRecordRequest.setLockCouponRecordIds(couponRecordIdList);
+//        lockCouponRecordRequest.setOrderOutTradeNo(orderOutTradeNo);
+//        try {
+//            JsonData jsonData = this.lockCouponRecord(lockCouponRecordRequest);
+//            if (Objects.isNull(jsonData) || jsonData.getCode() != 0) {
+//                return JsonData.returnJson(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
+//            }
+//        } catch (Exception e) {
+//            return JsonData.returnJson(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
+//        }
+        List<CouponRecordVO> couponRecordVOList = couponRecordDOList.stream().map(obj -> {
+            CouponRecordVO couponRecordVO = new CouponRecordVO();
+            BeanUtils.copyProperties(obj, couponRecordVO);
+            return couponRecordVO;
+        }).collect(Collectors.toList());
+
+        return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS, couponRecordVOList);
     }
 }
