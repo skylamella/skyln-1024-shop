@@ -1,4 +1,4 @@
-package cn.skyln.components;
+package cn.skyln.components.strategy;
 
 import cn.skyln.web.model.VO.PayInfoVO;
 

@@ -1,6 +1,6 @@
-package cn.skyln.components.strategyImpl;
+package cn.skyln.components.strategy.impl;
 
-import cn.skyln.components.PayStrategy;
+import cn.skyln.components.strategy.PayStrategy;
 import cn.skyln.config.PayUrlConfig;
 import cn.skyln.web.model.VO.PayInfoVO;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class AlipayStrategy implements PayStrategy {
+public class WechatPayStrategy implements PayStrategy {
 
     @Autowired
     private PayUrlConfig payUrlConfig;

@@ -1,8 +1,8 @@
 package cn.skyln.components.factories;
 
 import cn.skyln.components.context.PayStrategyContext;
-import cn.skyln.components.strategyImpl.AlipayStrategy;
-import cn.skyln.components.strategyImpl.WechatPayStrategy;
+import cn.skyln.components.strategy.impl.AlipayStrategy;
+import cn.skyln.components.strategy.impl.WechatPayStrategy;
 import cn.skyln.enums.ProductOrderPayTypeEnum;
 import cn.skyln.web.model.VO.PayInfoVO;
 import lombok.extern.slf4j.Slf4j;

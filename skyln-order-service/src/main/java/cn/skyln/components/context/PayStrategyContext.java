@@ -1,6 +1,6 @@
 package cn.skyln.components.context;
 
-import cn.skyln.components.PayStrategy;
+import cn.skyln.components.strategy.PayStrategy;
 import cn.skyln.web.model.VO.PayInfoVO;
 
 /**
