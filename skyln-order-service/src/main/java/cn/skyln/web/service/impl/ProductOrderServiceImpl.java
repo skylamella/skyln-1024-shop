@@ -1,5 +1,6 @@
 package cn.skyln.web.service.impl;
 
+import cn.skyln.components.factories.PayFactory;
 import cn.skyln.config.RabbitMQConfig;
 import cn.skyln.enums.*;
 import cn.skyln.exception.BizException;
@@ -19,6 +20,7 @@ import cn.skyln.web.model.DTO.*;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
 import cn.skyln.web.model.VO.CouponRecordVO;
 import cn.skyln.web.model.VO.OrderItemVO;
+import cn.skyln.web.model.VO.PayInfoVO;
 import cn.skyln.web.model.VO.ProductOrderAddressVO;
 import cn.skyln.web.service.ProductOrderService;
 import com.alibaba.fastjson.JSON;
@@ -69,6 +71,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Autowired
     private RabbitMQConfig rabbitMQConfig;
+
+    @Autowired
+    private PayFactory payFactory;
 
     /**
      * 创建订单
@@ -131,6 +136,16 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
                 orderCloseMessage);
         log.info("自动关单延迟消息发送成功：{}", orderCloseMessage);
         // 创建支付 todo
+        PayInfoVO payInfoVO = new PayInfoVO();
+        payInfoVO.setOutTradeNo(orderOutTradeNo);
+        payInfoVO.setPayAmount(confirmOrderRequest.getRealPayAmount());
+        payInfoVO.setPayType(confirmOrderRequest.getPayType());
+        payInfoVO.setClientType(confirmOrderRequest.getClientType());
+        payInfoVO.setTitle("这是一个标题");
+        payInfoVO.setDescription("这是一个描述");
+        // 设置30分钟过期时间
+        payInfoVO.setOrderPayTimeMills(30 * 60 * 1000);
+        payFactory.pay(payInfoVO);
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, addressVO);
     }
 

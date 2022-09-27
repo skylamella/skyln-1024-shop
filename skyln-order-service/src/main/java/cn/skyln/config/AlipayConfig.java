@@ -1,5 +1,8 @@
 package cn.skyln.config;
 
+import com.alipay.api.AlipayClient;
+import com.alipay.api.DefaultAlipayClient;
+
 /**
  * @Author: lamella
  * @Date: 2022/09/26/21:53
@@ -32,7 +35,38 @@ public class AlipayConfig {
      */
     private static final String CHARSET = "UTF-8";
 
-    private AlipayConfig(){
+    /**
+     * 返回参数格式
+     */
+    private static final String FORMAT = "json";
 
+    /**
+     * 沙箱网关
+     */
+    private static final String PAY_GATEWAY = "https://openapi.alipaydev.com/gateway.do";
+
+    /**
+     * 构造函数私有化
+     */
+    private AlipayConfig() {
+
+    }
+
+    private volatile static AlipayClient instance = null;
+
+    /**
+     * 单例模式获取，双重锁校验
+     *
+     * @return AlipayClient
+     */
+    public static AlipayClient getInstance() {
+        if (instance == null) {
+            synchronized (AlipayConfig.class) {
+                if (instance == null) {
+                    instance = new DefaultAlipayClient(PAY_GATEWAY, APPID, APP_PRI_KEY, FORMAT, CHARSET, ALIPAY_PUB_KEY, SIGN_TYPE);
+                }
+            }
+        }
+        return instance;
     }
 }
