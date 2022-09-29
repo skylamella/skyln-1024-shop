@@ -13,6 +13,12 @@ public class OrderCloseMessage {
      * 消息队列id
      */
     private Long messageId;
+
+    /**
+     * 支付类型 微信-支付宝-银行卡-其他
+     */
+    private String payType;
+
     /**
      * 订单号
      */

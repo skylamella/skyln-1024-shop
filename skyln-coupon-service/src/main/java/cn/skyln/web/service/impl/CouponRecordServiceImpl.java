@@ -209,7 +209,7 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
             // 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复优惠券使用记录为NEW
             log.warn("订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复优惠券使用记录为NEW：{}", couponRecordMessage);
             couponTaskDO.setLockState(StockTaskStateEnum.CANCEL.name());
-            int rows = couponTaskMapper.updateById(couponTaskDO);
+            couponTaskMapper.updateById(couponTaskDO);
             // 恢复优惠券记录为NEW状态
             couponRecordMapper.updateState(couponTaskDO.getCouponRecordId(), CouponUseStateEnum.NEW.name());
         } else {

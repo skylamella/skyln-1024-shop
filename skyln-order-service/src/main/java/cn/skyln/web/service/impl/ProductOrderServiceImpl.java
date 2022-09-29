@@ -131,22 +131,26 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         // 发送延迟消息，用于自动关单
         OrderCloseMessage orderCloseMessage = new OrderCloseMessage();
         orderCloseMessage.setOutTradeNo(orderOutTradeNo);
+        orderCloseMessage.setPayType(confirmOrderRequest.getPayType());
         rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(),
                 rabbitMQConfig.getOrderCloseDelayRoutingKey(),
                 orderCloseMessage);
         log.info("自动关单延迟消息发送成功：{}", orderCloseMessage);
-        // 创建支付 todo
+        // 创建支付
         PayInfoVO payInfoVO = new PayInfoVO();
         payInfoVO.setOutTradeNo(orderOutTradeNo);
         payInfoVO.setPayAmount(confirmOrderRequest.getRealPayAmount());
         payInfoVO.setPayType(confirmOrderRequest.getPayType());
         payInfoVO.setClientType(confirmOrderRequest.getClientType());
-        payInfoVO.setTitle("这是一个标题");
-        payInfoVO.setDescription("这是一个描述");
+        String title = orderItemVOList.get(0).getProductTitle();
+        if (orderItemVOList.size() > 1) {
+            title = title + "等" + orderItemVOList.size() + "件商品";
+        }
+        payInfoVO.setTitle(title);
+        payInfoVO.setDescription(title);
         // 设置30分钟过期时间
         payInfoVO.setOrderPayTimeMills(30 * 60 * 1000);
-        payFactory.pay(payInfoVO);
-        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, addressVO);
+        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, payFactory.pay(payInfoVO));
     }
 
     /**
@@ -277,22 +281,37 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         }
         // 获取使用的优惠券ID列表
         List<Long> couponRecordIdList = confirmOrderRequest.getCouponRecordIdList();
-        // 判断优惠券是否可用
-        List<CouponRecordVO> couponRecordVOList = this.getCartCouponRecord(couponRecordIdList, orderOutTradeNo);
-        // 计算购物车价格是否满足优惠券满减条件
-        if (Objects.isNull(couponRecordVOList) || couponRecordVOList.size() == 0) {
-            log.error("优惠券使用失败");
-            throw new BizException(BizCodeEnum.COUPON_UNAVAILABLE);
-        }
-        for (CouponRecordVO couponRecordVO : couponRecordVOList) {
-            if (realPayAmount.compareTo(couponRecordVO.getConditionPrice()) < 0) {
-                log.error("不满足优惠券满减金额");
-                throw new BizException(BizCodeEnum.ORDER_CONFIRM_COUPON_FAIL);
+        boolean useCouponFlag = true;
+        if (Objects.isNull(couponRecordIdList) || couponRecordIdList.size() == 0) {
+            useCouponFlag = false;
+        } else if (couponRecordIdList.size() == 1) {
+            useCouponFlag = !StringUtils.equals(couponRecordIdList.get(0).toString(), -1 + "");
+        } else {
+            for (Long l : couponRecordIdList) {
+                if (StringUtils.equals(l.toString(), -1 + "")) {
+                    useCouponFlag = false;
+                    break;
+                }
             }
-            if (couponRecordVO.getPrice().compareTo(realPayAmount) > 0) {
-                realPayAmount = BigDecimal.ZERO;
-            } else {
-                realPayAmount = realPayAmount.subtract(couponRecordVO.getPrice());
+        }
+        if (useCouponFlag) {
+            // 判断优惠券是否可用
+            List<CouponRecordVO> couponRecordVOList = this.getCartCouponRecord(couponRecordIdList, orderOutTradeNo);
+            // 计算购物车价格是否满足优惠券满减条件
+            if (Objects.isNull(couponRecordVOList) || couponRecordVOList.size() == 0) {
+                log.error("优惠券使用失败");
+                throw new BizException(BizCodeEnum.COUPON_UNAVAILABLE);
+            }
+            for (CouponRecordVO couponRecordVO : couponRecordVOList) {
+                if (realPayAmount.compareTo(couponRecordVO.getConditionPrice()) < 0) {
+                    log.error("不满足优惠券满减金额");
+                    throw new BizException(BizCodeEnum.ORDER_CONFIRM_COUPON_FAIL);
+                }
+                if (couponRecordVO.getPrice().compareTo(realPayAmount) > 0) {
+                    realPayAmount = BigDecimal.ZERO;
+                } else {
+                    realPayAmount = realPayAmount.subtract(couponRecordVO.getPrice());
+                }
             }
         }
         if (realPayAmount.compareTo(confirmOrderRequest.getRealPayAmount()) != 0) {
@@ -410,7 +429,10 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         }
 
         // 向第三方支付查询订单是否真的未支付 todo
-        String payResult = "";
+        PayInfoVO payInfoVO = new PayInfoVO();
+        payInfoVO.setOutTradeNo(orderCloseMessage.getOutTradeNo());
+        payInfoVO.setPayType(orderCloseMessage.getPayType());
+        String payResult = payFactory.queryPaySuccess(payInfoVO);
         // 结果为空，则未支付成功，本地取消订单
         if (StringUtils.isBlank(payResult)) {
             productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.NEW.name(), ProductOrderStateEnum.CANCEL.name());

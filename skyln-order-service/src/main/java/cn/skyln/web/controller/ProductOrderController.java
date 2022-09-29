@@ -55,26 +55,7 @@ public class ProductOrderController {
                              HttpServletResponse response) {
         JsonData jsonData = productOrderService.confirmOrder(confirmOrderRequest);
         if (jsonData.getCode() == 0) {
-            String client = confirmOrderRequest.getClientType();
-            String payType = confirmOrderRequest.getPayType();
-
-            if (StringUtils.equalsIgnoreCase(payType, ProductOrderPayTypeEnum.ALIPAY.name())) {
-                // 如果是支付宝网页支付，都是跳转网页，APP除外
-
-                if (StringUtils.equalsIgnoreCase(client, ClientType.APP.name())) {
-                    // APP SDK支付，TODO
-                    log.info("[创建支付宝APP支付订单成功] {}", confirmOrderRequest);
-                } else {
-                    log.info("[创建支付宝网页支付订单成功] {}", confirmOrderRequest);
-                    writeData(response, jsonData);
-                }
-            } else if (StringUtils.equalsIgnoreCase(payType, ProductOrderPayTypeEnum.WECHAT.name())) {
-                // 如果是微信支付，TODO
-                log.info("[创建微信支付订单成功] {}", confirmOrderRequest);
-            } else if (StringUtils.equalsIgnoreCase(payType, ProductOrderPayTypeEnum.BANK.name())) {
-                // 如果是银行卡支付，TODO
-                log.info("[创建银行卡支付订单成功] {}", confirmOrderRequest);
-            }
+            writeData(response, jsonData);
         } else {
             log.error("[创建订单失败] {}", jsonData);
         }
