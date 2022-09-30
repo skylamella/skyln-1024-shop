@@ -2,8 +2,8 @@ package cn.skyln.mq;
 
 import cn.skyln.constant.CacheKey;
 import cn.skyln.model.CartMessage;
-import cn.skyln.mqError.mapper.MqErrorLogMapper;
-import cn.skyln.mqError.model.MqErrorLogDO;
+import cn.skyln.web.mapper.MqErrorLogMapper;
+import cn.skyln.web.model.MqErrorLogDO;
 import cn.skyln.web.service.CartService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;

@@ -33,15 +33,15 @@
         values
         <foreach collection="orderItemList" item="item" index="index" separator=",">
             (
-            #{item.productOrderId}
-            #{item.outTradeNo}
-            #{item.productId}
-            #{item.productName}
-            #{item.productImg}
-            #{item.buyNum}
-            #{item.createTime}
-            #{item.totalAmount}
-            #{item.amount}
+            #{item.productOrderId},
+            #{item.outTradeNo},
+            #{item.productId},
+            #{item.productName},
+            #{item.productImg},
+            #{item.buyNum},
+            #{item.createTime},
+            #{item.totalAmount},
+            #{item.amount},
             )
         </foreach>
     </insert>

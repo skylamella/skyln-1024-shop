@@ -177,6 +177,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             itemDO.setTotalAmount(obj.getTotalAmount());
             return itemDO;
         }).collect(Collectors.toList());
+        // todo 批量插入bug
         int rows = orderItemMapper.insertBatch(list);
         if (rows != list.size()) {
             log.error("新增订单项失败");

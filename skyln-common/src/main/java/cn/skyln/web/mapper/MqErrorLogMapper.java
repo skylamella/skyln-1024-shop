@@ -1,6 +1,6 @@
-package cn.skyln.mqError.mapper;
+package cn.skyln.web.mapper;
 
-import cn.skyln.mqError.model.MqErrorLogDO;
+import cn.skyln.web.model.MqErrorLogDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

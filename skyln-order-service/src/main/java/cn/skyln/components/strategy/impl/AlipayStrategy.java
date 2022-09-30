@@ -80,6 +80,16 @@ public class AlipayStrategy implements PayStrategy {
             } else if (StringUtils.equalsIgnoreCase(payType, ClientType.PC.name())) {
                 // PC网页支付
                 AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
+                // 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
+                double timeOut = Math.floor(payInfoVO.getOrderPayTimeMills() / (1000 * 60));
+                // 前端也需要判断订单是否要关闭了，如果快要到期则不给二次支付
+                if (timeOut < 1) {
+                    throw new BizException(BizCodeEnum.PAY_ORDER_PAY_TIMEOUT);
+                }
+                content.remove("timeout_express");
+                content.put("time_expire", Double.valueOf(timeOut) + "m");
+//                content.put("passback_params", "");
+//                content.put("extend_params", JSON.toJSONString(new HashMap<String, String>().put("sys_service_provider_id", "")));
                 request.setBizContent(JSON.toJSONString(content));
                 request.setNotifyUrl(payUrlConfig.getAlipayCallbackUrl());
                 request.setReturnUrl(payUrlConfig.getAlipaySuccessReturnUrl());

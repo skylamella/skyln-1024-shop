@@ -1,4 +1,4 @@
-package cn.skyln.mqError.model;
+package cn.skyln.web.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;

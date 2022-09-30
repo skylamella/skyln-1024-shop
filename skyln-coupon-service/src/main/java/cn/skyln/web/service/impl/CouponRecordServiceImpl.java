@@ -138,6 +138,7 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
             couponTaskDO.setLockState(StockTaskStateEnum.LOCK.name());
             return couponTaskDO;
         }).collect(Collectors.toList());
+        // todo 批量插入bug
         int insertRows = couponTaskMapper.insertBatch(couponTaskDOList);
         log.info("新增优惠券记录task，insertRows={}", insertRows);
         if (lockCouponRecordIds.size() == updateRows && lockCouponRecordIds.size() == insertRows) {
