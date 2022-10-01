@@ -84,41 +84,5 @@ public class ProductOrderController {
         }
     }
 
-    @GetMapping("test_pay")
-    public void testAlipay(HttpServletResponse httpServletResponse) throws AlipayApiException {
-        Map<String, String> content = new HashMap<>();
-        //商户订单号,64个字符以内、可包含字母、数字、下划线；需保证在商户端不重复
-        String no = UUID.randomUUID().toString();
-        log.info("订单号:{}", no);
-        content.put("out_trade_no", no);
-        content.put("product_code", "FAST_INSTANT_TRADE_PAY");
-        //订单总金额，单位为元，精确到小数点后两位
-        content.put("total_amount", String.valueOf("111.99"));
-        //商品标题/交易标题/订单标题/订单关键字等。 注意：不可使用特殊字符，如 /，=，&amp; 等。
-        content.put("subject", "杯子");
-        //商品描述，可空
-        content.put("body", "好的杯子");
-        // 该笔订单允许的最晚付款时间，逾期将关闭交易。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。
-        // 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
-        content.put("timeout_express", "5m");
-        AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
-        request.setBizContent(JSON.toJSONString(content));
-        request.setNotifyUrl(payUrlConfig.getAlipayCallbackUrl());
-        request.setReturnUrl(payUrlConfig.getAlipaySuccessReturnUrl());
-        AlipayTradeWapPayResponse response = AlipayConfig.getInstance().pageExecute(request);
-        if (response.isSuccess()) {
-            log.info("支付宝支付调用成功");
-            String body = response.getBody();
-            httpServletResponse.setContentType("text/html;charset=UTF-8");
-            try (PrintWriter writer = httpServletResponse.getWriter()){
-                writer.write(body);
-                writer.flush();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        } else {
-            log.info("支付宝支付调用失败");
-        }
-    }
 }
 

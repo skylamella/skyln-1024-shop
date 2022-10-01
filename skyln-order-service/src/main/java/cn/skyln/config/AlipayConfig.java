@@ -18,7 +18,7 @@ public class AlipayConfig {
     /**
      * 支付宝公钥
      */
-    private static final String ALIPAY_PUB_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuZpexJcEWmXnnHEGR1mDFassB54thQVZouL92dJeSwfI2WqY5Ec3YMRcXq8A8xj0t1IlD9bbOPWyknX2B7ArZHajG37vGn8iXn0yTlovyCyjMAScFFMUMNieaww5bx6OkyrP0Q4sPdrjR3W6xmcdBl9vrbSRWAK6W/T1K1pL5/6trK9Fc0zuceoJuB9p0IC6aspuTKwjeKXX5Wi2PEzHN0EnEMWoepOwRyhDJ5meiqp9jy1Y4RnVbBJ513384YP+TPo4Ud+kaU+41AMCKCRK6tcLxtTA3uY6lhtu8RlVkMIDbUIoMPme6ObinOhFFhGW0Ww+wMH6x+wycLcGPIONkQIDAQAB";
+    public static final String ALIPAY_PUB_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuZpexJcEWmXnnHEGR1mDFassB54thQVZouL92dJeSwfI2WqY5Ec3YMRcXq8A8xj0t1IlD9bbOPWyknX2B7ArZHajG37vGn8iXn0yTlovyCyjMAScFFMUMNieaww5bx6OkyrP0Q4sPdrjR3W6xmcdBl9vrbSRWAK6W/T1K1pL5/6trK9Fc0zuceoJuB9p0IC6aspuTKwjeKXX5Wi2PEzHN0EnEMWoepOwRyhDJ5meiqp9jy1Y4RnVbBJ513384YP+TPo4Ud+kaU+41AMCKCRK6tcLxtTA3uY6lhtu8RlVkMIDbUIoMPme6ObinOhFFhGW0Ww+wMH6x+wycLcGPIONkQIDAQAB";
 
     /**
      * 支付宝沙箱APPID
@@ -28,17 +28,17 @@ public class AlipayConfig {
     /**
      * 签名类型
      */
-    private static final String SIGN_TYPE = "RSA2";
+    public static final String SIGN_TYPE = "RSA2";
 
     /**
      * 编码
      */
-    private static final String CHARSET = "UTF-8";
+    public static final String CHARSET = "UTF-8";
 
     /**
      * 返回参数格式
      */
-    private static final String FORMAT = "json";
+    public static final String FORMAT = "json";
 
     /**
      * 沙箱网关

@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -446,5 +447,17 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             log.warn("支付成功，主动把订单状态改成已支付，造成该情况的原因可能是支付通道回调有问题：{}", orderCloseMessage);
         }
         return true;
+    }
+
+    /**
+     * 支付结果回调通知
+     *
+     * @param payType   支付类型
+     * @param paramsMap 回调参数
+     * @return JsonData
+     */
+    @Override
+    public JsonData handlerOrderCallbackMsg(ProductOrderPayTypeEnum payType, Map<String, String> paramsMap) {
+        return null;
     }
 }

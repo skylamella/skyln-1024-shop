@@ -1,10 +1,13 @@
 package cn.skyln.web.service;
 
+import cn.skyln.enums.ProductOrderPayTypeEnum;
 import cn.skyln.model.OrderCloseMessage;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.ProductOrderDO;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -39,4 +42,13 @@ public interface ProductOrderService extends IService<ProductOrderDO> {
      * @return 关单结果
      */
     boolean delayCloseProductOrder(OrderCloseMessage orderCloseMessage);
+
+    /**
+     * 支付结果回调通知
+     *
+     * @param payType   支付类型
+     * @param paramsMap 回调参数
+     * @return JsonData
+     */
+    JsonData handlerOrderCallbackMsg(ProductOrderPayTypeEnum payType, Map<String, String> paramsMap);
 }
