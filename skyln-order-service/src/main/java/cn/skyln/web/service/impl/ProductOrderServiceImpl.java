@@ -2,6 +2,7 @@ package cn.skyln.web.service.impl;
 
 import cn.skyln.components.factories.PayFactory;
 import cn.skyln.config.RabbitMQConfig;
+import cn.skyln.constant.TimeConstant;
 import cn.skyln.enums.*;
 import cn.skyln.exception.BizException;
 import cn.skyln.interceptor.LoginInterceptor;
@@ -150,8 +151,15 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         payInfoVO.setTitle(title);
         payInfoVO.setDescription(title);
         // 设置30分钟过期时间
-        payInfoVO.setOrderPayTimeMills(30 * 60 * 1000);
-        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, payFactory.pay(payInfoVO));
+        payInfoVO.setOrderPayTimeMills(TimeConstant.ORDER_PAY_TIMEOUT_MILLS);
+        String payResult = payFactory.pay(payInfoVO);
+        if (StringUtils.isNotBlank(payResult)) {
+            log.info("创建支付订单成功：payInfoVO={}，payResult={}", payInfoVO, payResult);
+            return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, payResult);
+        } else {
+            log.error("创建支付订单失败：payInfoVO={}", payInfoVO);
+            return JsonData.returnJson(BizCodeEnum.PAY_ORDER_FAIL);
+        }
     }
 
     /**
@@ -432,9 +440,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             return true;
         }
 
-        // 向第三方支付查询订单是否真的未支付 todo
+        // 向第三方支付查询订单是否真的未支付
         PayInfoVO payInfoVO = new PayInfoVO();
-        payInfoVO.setOutTradeNo(orderCloseMessage.getOutTradeNo());
+        payInfoVO.setOutTradeNo(outTradeNo);
         payInfoVO.setPayType(orderCloseMessage.getPayType());
         String payResult = payFactory.queryPaySuccess(payInfoVO);
         // 结果为空，则未支付成功，本地取消订单
@@ -467,10 +475,10 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
             if (StringUtils.equalsIgnoreCase(tradeStatus, "TRADE_SUCCESS") || StringUtils.equalsIgnoreCase(tradeStatus, "TRADE_FINISHED")) {
                 // 更新订单状态
-                productOrderMapper.updateOrderPayState(outTradeNo,ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
+                productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
                 return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
             }
-        }else if(StringUtils.equalsIgnoreCase(payType.name(), ProductOrderPayTypeEnum.WECHAT.name())){
+        } else if (StringUtils.equalsIgnoreCase(payType.name(), ProductOrderPayTypeEnum.WECHAT.name())) {
             // todo 微信支付
         }
         return JsonData.returnJson(BizCodeEnum.PAY_ORDER_CALLBACK_NOT_SUCCESS);
