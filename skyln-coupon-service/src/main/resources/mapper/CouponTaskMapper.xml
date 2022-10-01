@@ -28,7 +28,7 @@
             #{item.couponRecordId},
             #{item.createTime},
             #{item.outTradeNo},
-            #{item.lockState},
+            #{item.lockState}
             )
         </foreach>
     </insert>

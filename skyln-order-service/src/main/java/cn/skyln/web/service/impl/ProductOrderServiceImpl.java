@@ -175,9 +175,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             itemDO.setBuyNum(obj.getBuyNum());
             itemDO.setAmount(obj.getAmount());
             itemDO.setTotalAmount(obj.getTotalAmount());
+            log.info("ProductOrderItemDO： {}", itemDO);
             return itemDO;
         }).collect(Collectors.toList());
-        // todo 批量插入bug
         int rows = orderItemMapper.insertBatch(list);
         if (rows != list.size()) {
             log.error("新增订单项失败");
@@ -244,6 +244,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
      * @param orderOutTradeNo     订单号
      */
     private void lockCouponRecords(ConfirmOrderRequest confirmOrderRequest, String orderOutTradeNo) {
+        log.info("锁定优惠券:{}", confirmOrderRequest);
         List<Long> couponRecordIdList = confirmOrderRequest.getCouponRecordIdList();
         if (Objects.nonNull(couponRecordIdList) && couponRecordIdList.size() > 0) {
             for (Long id : couponRecordIdList) {
@@ -255,6 +256,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             lockCouponRecordDTO.setLockCouponRecordIds(couponRecordIdList);
             lockCouponRecordDTO.setOrderOutTradeNo(orderOutTradeNo);
             JsonData jsonData = couponFeignService.lockCouponRecords(lockCouponRecordDTO);
+            log.info("锁定优惠券返回数据：{}", jsonData);
             if (jsonData.getCode() != 0) {
                 log.error("优惠券锁定失败：{}", jsonData);
                 throw new BizException(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);

@@ -27,9 +27,8 @@
     </sql>
 
     <!-- 批量插入 -->
-    <insert id="insertBatch">
-        insert into product_order_item
-        (<include refid="Base_Column_List_No_Id"></include>)
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into product_order_item (<include refid="Base_Column_List_No_Id" />)
         values
         <foreach collection="orderItemList" item="item" index="index" separator=",">
             (
@@ -41,7 +40,7 @@
             #{item.buyNum},
             #{item.createTime},
             #{item.totalAmount},
-            #{item.amount},
+            #{item.amount}
             )
         </foreach>
     </insert>
