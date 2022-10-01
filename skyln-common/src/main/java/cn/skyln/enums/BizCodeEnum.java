@@ -86,7 +86,7 @@ public enum BizCodeEnum {
      */
     PAY_ORDER_FAIL(240001,"创建支付订单失败"),
     PAY_ORDER_CALLBACK_SIGN_FAIL(240002,"支付订单回调验证签失败"),
-    PAY_ORDER_CALLBACK_NOT_SUCCESS(240003,"创建支付订单失败"),
+    PAY_ORDER_CALLBACK_NOT_SUCCESS(240003,"支付回调订单更新失败"),
     PAY_ORDER_NOT_EXIST(240005,"订单不存在"),
     PAY_ORDER_STATE_ERROR(240006,"订单状态不正常"),
     PAY_ORDER_PAY_TIMEOUT(240007,"订单支付超时"),

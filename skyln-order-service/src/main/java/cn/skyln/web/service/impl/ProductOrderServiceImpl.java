@@ -458,6 +458,21 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
      */
     @Override
     public JsonData handlerOrderCallbackMsg(ProductOrderPayTypeEnum payType, Map<String, String> paramsMap) {
-        return null;
+        if (StringUtils.equalsIgnoreCase(payType.name(), ProductOrderPayTypeEnum.ALIPAY.name())) {
+            // 支付宝支付
+            // 获取商户订单号
+            String outTradeNo = paramsMap.get("out_trade_no");
+            // 交易状态
+            String tradeStatus = paramsMap.get("trade_status");
+
+            if (StringUtils.equalsIgnoreCase(tradeStatus, "TRADE_SUCCESS") || StringUtils.equalsIgnoreCase(tradeStatus, "TRADE_FINISHED")) {
+                // 更新订单状态
+                productOrderMapper.updateOrderPayState(outTradeNo,ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
+                return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS);
+            }
+        }else if(StringUtils.equalsIgnoreCase(payType.name(), ProductOrderPayTypeEnum.WECHAT.name())){
+            // todo 微信支付
+        }
+        return JsonData.returnJson(BizCodeEnum.PAY_ORDER_CALLBACK_NOT_SUCCESS);
     }
 }
