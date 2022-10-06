@@ -82,7 +82,13 @@ public class ProductOrderMQListener {
             }
         } catch (Exception e) {
             log.error("{}-记录异常：{}，msg：{}", MQChannelStateEnum.DELAY_ORDER_CLOSE.getMsg(), e, orderCloseMessage);
-            retryNums = Math.max(retryNums, CheckUtil.removeMQRedisKey(redisTemplate, mqKey, msgTag, channel));
+            retryNums = Math.max(retryNums, CheckUtil.checkMQRetryNums(redisTemplate,
+                    log,
+                    mqKey,
+                    orderCloseMessage,
+                    msgTag,
+                    channel,
+                    MQChannelStateEnum.DELAY_ORDER_CLOSE.getMsg()));
             lock.unlock();
         } finally {
             if (retryNums >= 5) {

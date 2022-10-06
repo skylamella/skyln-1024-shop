@@ -82,7 +82,13 @@ public class ProductStockMQListener {
             }
         } catch (Exception e) {
             log.error("{}-记录异常：{}，msg：{}", MQChannelStateEnum.STOCK_RECORD_RELEASE.getMsg(), e, productStockMessage);
-            retryNums = Math.max(retryNums, CheckUtil.removeMQRedisKey(redisTemplate, mqKey, msgTag, channel));
+            retryNums = Math.max(retryNums, CheckUtil.checkMQRetryNums(redisTemplate,
+                    log,
+                    mqKey,
+                    productStockMessage,
+                    msgTag,
+                    channel,
+                    MQChannelStateEnum.STOCK_RECORD_RELEASE.getMsg()));
         } finally {
             if (retryNums >= 5) {
                 // 持续消费失败则插入数据库

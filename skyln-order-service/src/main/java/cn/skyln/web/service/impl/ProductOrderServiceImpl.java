@@ -450,7 +450,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             log.info("结果为空，则未支付成功，本地取消订单：{}", orderCloseMessage);
         } else {
             // 支付成功，主动把订单状态改成已支付，造成该情况的原因可能是支付通道回调有问题
-            productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.NEW.name(), ProductOrderStateEnum.PAY.name());
+            productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
             log.warn("支付成功，主动把订单状态改成已支付，造成该情况的原因可能是支付通道回调有问题：{}", orderCloseMessage);
         }
         return true;
@@ -463,7 +463,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
      */
     @Override
     public void cancelCloseProductOrder(String outTradeNo) {
-        productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.NEW.name(), ProductOrderStateEnum.CANCEL.name());
+        productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.CANCEL.name(), ProductOrderStateEnum.NEW.name());
     }
 
     /**

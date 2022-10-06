@@ -98,30 +98,4 @@ public class CheckUtil {
         }
         return retryNums;
     }
-
-    /**
-     * 通用性MQ消息消费catch模块
-     *
-     * @param redisTemplate redisTemplate
-     * @param mqKey         mqKey
-     * @param msgTag        msgTag
-     * @param channel       channel
-     * @return 重试次数
-     */
-    public static int removeMQRedisKey(RedisTemplate redisTemplate,
-                                       String mqKey,
-                                       long msgTag,
-                                       Channel channel) throws IOException {
-        int retryNums = 1;
-        if (redisTemplate.hasKey(mqKey)) {
-            retryNums = (int) redisTemplate.opsForValue().get(mqKey);
-            if (retryNums >= 5) {
-                redisTemplate.delete(mqKey);
-                channel.basicAck(msgTag, false);
-            } else {
-                channel.basicReject(msgTag, true);
-            }
-        }
-        return retryNums;
-    }
 }

@@ -94,7 +94,13 @@ public class CouponMQListener {
             }
         } catch (Exception e) {
             log.error("{}-记录异常：{}，msg：{}", MQChannelStateEnum.COUPON_RECORD_RELEASE.getMsg(), e, couponRecordMessage);
-            retryNums = Math.max(retryNums, CheckUtil.removeMQRedisKey(redisTemplate, mqKey, msgTag, channel));
+            retryNums = Math.max(retryNums, CheckUtil.checkMQRetryNums(redisTemplate,
+                    log,
+                    mqKey,
+                    couponRecordMessage,
+                    msgTag,
+                    channel,
+                    MQChannelStateEnum.COUPON_RECORD_RELEASE.getMsg()));
             lock.unlock();
         } finally {
             if (retryNums >= 5) {

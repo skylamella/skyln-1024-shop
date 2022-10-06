@@ -61,7 +61,7 @@ public class AlipayStrategy implements PayStrategy {
     }
 
     private String payWithType(PayInfoVO payInfoVO, Map<String, String> content) {
-        String payType = payInfoVO.getPayType();
+        String payType = payInfoVO.getClientType();
         String form = "";
         try {
             if (StringUtils.equalsIgnoreCase(payType, ClientType.H5.name())) {

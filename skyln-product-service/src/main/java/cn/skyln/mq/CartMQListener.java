@@ -83,7 +83,13 @@ public class CartMQListener {
             }
         } catch (Exception e) {
             log.error("{}-记录异常：{}，msg：{}", MQChannelStateEnum.CLEAN_CART_RECORD.getMsg(), e, cartMessage);
-            retryNums = Math.max(retryNums, CheckUtil.removeMQRedisKey(redisTemplate, mqKey, msgTag, channel));
+            retryNums = Math.max(retryNums, CheckUtil.checkMQRetryNums(redisTemplate,
+                    log,
+                    mqKey,
+                    cartMessage,
+                    msgTag,
+                    channel,
+                    MQChannelStateEnum.CLEAN_CART_RECORD.getMsg()));
             lock.unlock();
         } finally {
             if (retryNums >= 5) {
