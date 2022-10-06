@@ -10,11 +10,11 @@ import cn.skyln.web.service.CartService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @Author: lamella
@@ -24,6 +24,7 @@ import java.util.Objects;
 @Api(tags = "购物车模块")
 @RestController
 @RequestMapping("/api/v1/cart")
+@Slf4j
 public class CartController {
 
     @Autowired
@@ -75,7 +76,7 @@ public class CartController {
     @PostMapping("confirm_order_cart_items")
     public JsonData confirmOrderCartItems(@ApiParam(value = "商品ID列表", required = true) @RequestBody CartDTO cartDTO) {
         List<CartItemVO> cartItemVOList = cartService.confirmOrderCartItems(cartDTO);
-        if(cartItemVOList.size() == 0){
+        if (cartItemVOList.size() == 0) {
             return JsonData.returnJson(BizCodeEnum.CART_NOT_EXIT);
         }
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, cartItemVOList);

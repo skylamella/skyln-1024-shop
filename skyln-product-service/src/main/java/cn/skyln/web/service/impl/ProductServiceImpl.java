@@ -196,16 +196,37 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, ProductDO> im
                     }
                 }
             }
-            // 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复商品库存
             log.warn("订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复商品库存：{}", productStockMessage);
-            productTaskDO.setLockState(StockTaskStateEnum.CANCEL.name());
-            productTaskMapper.updateById(productTaskDO);
-            // 恢复商品库存
-            productMapper.unlockProductStock(productTaskDO.getProductId(), productTaskDO.getBuyNum());
+            this.cancelProductStockRecord(productTaskDO);
         } else {
             log.warn("工作单状态不是LOCK，state={}，消息：{}", productTaskDO.getLockState(), productStockMessage);
         }
         return true;
+    }
+
+    /**
+     * 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复商品库存
+     *
+     * @param productTaskDO ProductTaskDO
+     */
+    @Override
+    public void cancelProductStockRecord(ProductTaskDO productTaskDO) {
+        // 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复商品库存
+        productTaskDO.setLockState(StockTaskStateEnum.CANCEL.name());
+        productTaskMapper.updateById(productTaskDO);
+        // 恢复商品库存
+        productMapper.unlockProductStock(productTaskDO.getProductId(), productTaskDO.getBuyNum());
+    }
+
+    /**
+     * 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复商品库存
+     *
+     * @param taskId taskId
+     */
+    @Override
+    public void cancelProductStockRecord(Long taskId) {
+        ProductTaskDO productTaskDO = productTaskMapper.selectById(taskId);
+        this.cancelProductStockRecord(productTaskDO);
     }
 
     private ProductDetailVO beanProcess(ProductDO productDO) {

@@ -220,9 +220,8 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         // 设置总价，即不使用优惠券的价格
         productOrderDO.setTotalAmount(confirmOrderRequest.getTotalAmount());
         productOrderDO.setState(ProductOrderStateEnum.NEW.name());
-        // todo 过滤支付方式
-        ProductOrderPayTypeEnum.valueOf(confirmOrderRequest.getPayType());
-        productOrderDO.setPayType(confirmOrderRequest.getPayType());
+        productOrderDO.setPayType(ProductOrderPayTypeEnum.valueOf(confirmOrderRequest.getPayType()).name());
+
         productOrderDO.setReceiverAddress(JSON.toJSONString(addressVO));
         productOrderMapper.insert(productOrderDO);
         return productOrderDO;
@@ -447,7 +446,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         String payResult = payFactory.queryPaySuccess(payInfoVO);
         // 结果为空，则未支付成功，本地取消订单
         if (StringUtils.isBlank(payResult)) {
-            productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.NEW.name(), ProductOrderStateEnum.CANCEL.name());
+            this.cancelCloseProductOrder(outTradeNo);
             log.info("结果为空，则未支付成功，本地取消订单：{}", orderCloseMessage);
         } else {
             // 支付成功，主动把订单状态改成已支付，造成该情况的原因可能是支付通道回调有问题
@@ -455,6 +454,16 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             log.warn("支付成功，主动把订单状态改成已支付，造成该情况的原因可能是支付通道回调有问题：{}", orderCloseMessage);
         }
         return true;
+    }
+
+    /**
+     * 未支付成功，本地取消订单
+     *
+     * @param outTradeNo 订单号
+     */
+    @Override
+    public void cancelCloseProductOrder(String outTradeNo) {
+        productOrderMapper.updateOrderPayState(outTradeNo, ProductOrderStateEnum.NEW.name(), ProductOrderStateEnum.CANCEL.name());
     }
 
     /**

@@ -44,6 +44,13 @@ public interface ProductOrderService extends IService<ProductOrderDO> {
     boolean delayCloseProductOrder(OrderCloseMessage orderCloseMessage);
 
     /**
+     * 未支付成功，本地取消订单
+     *
+     * @param outTradeNo 订单号
+     */
+    void cancelCloseProductOrder(String outTradeNo);
+
+    /**
      * 支付结果回调通知
      *
      * @param payType   支付类型

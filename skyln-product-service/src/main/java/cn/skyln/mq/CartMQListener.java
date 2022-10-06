@@ -1,10 +1,11 @@
 package cn.skyln.mq;
 
 import cn.skyln.constant.CacheKey;
+import cn.skyln.enums.MQChannelStateEnum;
 import cn.skyln.model.CartMessage;
-import cn.skyln.web.mapper.MqErrorLogMapper;
-import cn.skyln.web.model.MqErrorLogDO;
+import cn.skyln.utils.CheckUtil;
 import cn.skyln.web.service.CartService;
+import cn.skyln.web.service.MqErrorLogService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -38,57 +39,59 @@ public class CartMQListener {
     private RedisTemplate redisTemplate;
 
     @Autowired
-    private MqErrorLogMapper mqErrorLogMapper;
+    private MqErrorLogService mqErrorLogService;
 
     @RabbitHandler
     public void cleanCartRecord(CartMessage cartMessage, Message message, Channel channel) throws IOException {
-        String lockKey = String.format(CacheKey.DISTRIBUTED_LOCK_KEY, "clean_cart_record", cartMessage.getOutTradeNo() + cartMessage.getProductId());
+        String lockKey = String.format(CacheKey.DISTRIBUTED_LOCK_KEY, MQChannelStateEnum.CLEAN_CART_RECORD.name(), cartMessage.getOutTradeNo() + cartMessage.getProductId());
         RLock lock = redissonClient.getLock(lockKey);
         lock.lock();
         log.info("监听到消息：cleanCartRecord消息内容：{}", cartMessage);
         long msgTag = message.getMessageProperties().getDeliveryTag();
-        int retryNums = 0;
+        int retryNums = 1;
+        String mqKey = String.format(CacheKey.MQ_KEY, MQChannelStateEnum.MQ_CLEAN_CART_RECORD.name(), cartMessage.getOutTradeNo() + ":" + cartMessage.getProductId());
         try {
-            log.info("清空购物车-分布式锁加锁成功:{}", Thread.currentThread().getId());
+            log.info("{}-分布式锁加锁成功:{}", MQChannelStateEnum.CLEAN_CART_RECORD.getMsg(), Thread.currentThread().getId());
             if (cartService.cleanCartRecord(cartMessage)) {
                 // 确认消息消费成功
                 channel.basicAck(msgTag, false);
             } else {
-                String mqKey = String.format(CacheKey.MQ_KEY, "mq_clean_cart_record", cartMessage.getOutTradeNo() + ":" + cartMessage.getProductId());
-                if (redisTemplate.hasKey(mqKey)) {
-                    retryNums = (int) redisTemplate.opsForValue().get(mqKey);
-                    redisTemplate.delete(mqKey);
-                    if (retryNums < 5) {
-                        redisTemplate.opsForValue().set(mqKey, ++retryNums);
-                        log.error("释放商品库存-失败，第{}次重试 flag=false：{}", retryNums, cartMessage);
-                        channel.basicReject(msgTag, true);
-                    } else {
-                        log.error("释放商品库存-失败，重试次数超过5次 flag=false：{}", cartMessage);
-                        // 重试次数超过5次，确认消息消费成功
-                        channel.basicAck(msgTag, false);
-                    }
-                } else {
-                    log.error("释放商品库存-失败，第1次重试 flag=false：{}", cartMessage);
-                    redisTemplate.opsForValue().set(mqKey, 0);
-                    channel.basicReject(msgTag, true);
-                }
-
-                log.error("释放商品库存-失败 flag=false：{}", cartMessage);
-                channel.basicReject(msgTag, true);
+                retryNums = CheckUtil.checkMQRetryNums(redisTemplate,
+                        log,
+                        mqKey,
+                        cartMessage,
+                        msgTag,
+                        channel,
+                        MQChannelStateEnum.CLEAN_CART_RECORD.getMsg());
+//                if (redisTemplate.hasKey(mqKey)) {
+//                    retryNums = (int) redisTemplate.opsForValue().get(mqKey);
+//                    redisTemplate.delete(mqKey);
+//                    if (retryNums < 5) {
+//                        redisTemplate.opsForValue().set(mqKey, ++retryNums);
+//                        log.error("清空购物车-失败，第{}次重试 flag=false：{}", retryNums, cartMessage);
+//                        channel.basicReject(msgTag, true);
+//                    } else {
+//                        log.error("清空购物车-失败，重试次数超过5次 flag=false：{}", cartMessage);
+//                        // 重试次数超过5次，确认消息消费成功
+//                        channel.basicAck(msgTag, false);
+//                    }
+//                } else {
+//                    log.error("清空购物车-失败，第1次重试 flag=false：{}", cartMessage);
+//                    redisTemplate.opsForValue().set(mqKey, 0);
+//                    channel.basicReject(msgTag, true);
+//                }
             }
         } catch (Exception e) {
-            log.error("清空购物车-记录异常：{}，msg：{}", e, cartMessage);
-            channel.basicReject(msgTag, true);
+            log.error("{}-记录异常：{}，msg：{}", MQChannelStateEnum.CLEAN_CART_RECORD.getMsg(), e, cartMessage);
+            retryNums = Math.max(retryNums, CheckUtil.removeMQRedisKey(redisTemplate, mqKey, msgTag, channel));
             lock.unlock();
         } finally {
             if (retryNums >= 5) {
                 // 持续消费失败则插入数据库
-                MqErrorLogDO mqErrorLogDO = new MqErrorLogDO();
-                mqErrorLogDO.setOutTradeNo(cartMessage.getOutTradeNo());
-                mqErrorLogMapper.insert(mqErrorLogDO);
+                mqErrorLogService.insertMqErrorLog(cartMessage.getOutTradeNo());
             }
             lock.unlock();
-            log.info("清空购物车-分布式锁解锁成功:{}", Thread.currentThread().getId());
+            log.info("{}-分布式锁解锁成功:{}", MQChannelStateEnum.CLEAN_CART_RECORD.getMsg(), Thread.currentThread().getId());
         }
     }
 }

@@ -3,6 +3,7 @@ package cn.skyln.web.service;
 import cn.skyln.model.ProductStockMessage;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.ProductDO;
+import cn.skyln.web.model.DO.ProductTaskDO;
 import cn.skyln.web.model.DTO.LockProductDTO;
 import cn.skyln.web.model.VO.ProductDetailVO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -60,4 +61,18 @@ public interface ProductService extends IService<ProductDO> {
      * @return 清理结果
      */
     boolean releaseProductStockRecord(ProductStockMessage productStockMessage);
+
+    /**
+     * 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复商品库存
+     *
+     * @param productTaskDO ProductTaskDO
+     */
+    void cancelProductStockRecord(ProductTaskDO productTaskDO);
+
+    /**
+     * 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复商品库存
+     *
+     * @param taskId taskId
+     */
+    void cancelProductStockRecord(Long taskId);
 }

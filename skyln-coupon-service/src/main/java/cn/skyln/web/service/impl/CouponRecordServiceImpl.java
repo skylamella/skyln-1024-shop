@@ -208,16 +208,43 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
             }
             // 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复优惠券使用记录为NEW
             log.warn("订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复优惠券使用记录为NEW：{}", couponRecordMessage);
-            couponTaskDO.setLockState(StockTaskStateEnum.CANCEL.name());
-            couponTaskMapper.updateById(couponTaskDO);
-            // 恢复优惠券记录为NEW状态
-            couponRecordMapper.updateState(couponTaskDO.getCouponRecordId(), CouponUseStateEnum.NEW.name());
+            this.cancelCouponRecord(couponTaskDO);
         } else {
             log.warn("工作单状态不是LOCK，state={}，消息：{}", couponTaskDO.getLockState(), couponRecordMessage);
         }
         return true;
     }
 
+    /**
+     * 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复优惠券使用记录为NEW
+     *
+     * @param couponTaskDO CouponTaskDO
+     */
+    @Override
+    public void cancelCouponRecord(CouponTaskDO couponTaskDO) {
+        couponTaskDO.setLockState(StockTaskStateEnum.CANCEL.name());
+        couponTaskMapper.updateById(couponTaskDO);
+        // 恢复优惠券记录为NEW状态
+        couponRecordMapper.updateState(couponTaskDO.getCouponRecordId(), CouponUseStateEnum.NEW.name());
+    }
+
+    /**
+     * 订单不存在，或者订单被取消，确认消息，修改task状态为CANCEL，恢复优惠券使用记录为NEW
+     *
+     * @param taskId taskId
+     */
+    @Override
+    public void cancelCouponRecord(Long taskId) {
+        CouponTaskDO couponTaskDO = couponTaskMapper.selectOne(new QueryWrapper<CouponTaskDO>().eq("id", taskId));
+        this.cancelCouponRecord(couponTaskDO);
+    }
+
+    /**
+     * 根据ID列表获取优惠券详情并锁定优惠券
+     *
+     * @param couponDTO CouponDTO
+     * @return JsonData
+     */
     @Override
     public JsonData queryUserCouponRecord(CouponDTO couponDTO) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
