@@ -19,6 +19,7 @@ import cn.skyln.web.model.DO.ProductOrderDO;
 import cn.skyln.web.model.DO.ProductOrderItemDO;
 import cn.skyln.web.model.DTO.*;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
+import cn.skyln.web.model.REQ.RepayOrderRequest;
 import cn.skyln.web.model.VO.*;
 import cn.skyln.web.service.ProductOrderService;
 import com.alibaba.fastjson.JSON;
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -96,6 +98,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
      * @return JsonData
      */
     @Override
+    @Transactional
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
         String orderOutTradeNo = CommonUtils.getRandomCode(32);
@@ -154,7 +157,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         String payResult = payFactory.pay(payInfoVO);
         if (StringUtils.isNotBlank(payResult)) {
             log.info("创建支付订单成功：payInfoVO={}，payResult={}", payInfoVO, payResult);
-            return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, payResult);
+            return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS, payResult);
         } else {
             log.error("创建支付订单失败：payInfoVO={}", payInfoVO);
             return JsonData.returnJson(BizCodeEnum.PAY_ORDER_FAIL);
@@ -520,5 +523,62 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
                     productOrderVO.setOrderItemVOList(collect);
                     return productOrderVO;
                 }).collect(Collectors.toList()));
+    }
+
+    /**
+     * 重新支付订单
+     *
+     * @param repayOrderRequest 重新支付订单对象
+     * @return JsonData
+     */
+    @Override
+    @Transactional
+    public JsonData repayOrder(RepayOrderRequest repayOrderRequest) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String orderOutTradeNo = repayOrderRequest.getOrderOutTradeNo();
+        ProductOrderDO productOrderDO = productOrderMapper.selectOne(new QueryWrapper<ProductOrderDO>()
+                .eq("user_id", loginUser.getId())
+                .eq("out_trade_no", orderOutTradeNo));
+        if (Objects.isNull(productOrderDO)) {
+            log.error("订单不存在：{}", repayOrderRequest);
+            return JsonData.returnJson(BizCodeEnum.PAY_ORDER_NOT_EXIST);
+        }
+        log.info("订单状态：{}", productOrderDO);
+        if (!StringUtils.equalsIgnoreCase(productOrderDO.getState(), ProductOrderStateEnum.NEW.name())) {
+            log.error("订单不是NEW状态：{}", repayOrderRequest);
+            return JsonData.returnJson(BizCodeEnum.PAY_ORDER_STATE_ERROR);
+        }
+        long orderLiveTime = CommonUtils.getCurrentTimeStamp() - productOrderDO.getCreateTime().getTime();
+        // 创建订单是临界点，所以再增加70秒，假如29分，则也不能支付了
+        orderLiveTime = orderLiveTime + 70 * 1000;
+        if (orderLiveTime > TimeConstant.ORDER_PAY_TIMEOUT_MILLS) {
+            log.error("订单支付超时：{}", repayOrderRequest);
+            return JsonData.returnJson(BizCodeEnum.PAY_ORDER_PAY_TIMEOUT);
+        }
+        if(!StringUtils.equalsIgnoreCase(productOrderDO.getPayType(),repayOrderRequest.getPayType())){
+            // 更新订单支付信息
+            productOrderDO.setPayType(repayOrderRequest.getPayType());
+            productOrderDO.setUpdateTime(new Date());
+            productOrderMapper.updateById(productOrderDO);
+        }
+        // 创建二次支付
+        PayInfoVO payInfoVO = new PayInfoVO();
+        payInfoVO.setOutTradeNo(orderOutTradeNo);
+        payInfoVO.setPayAmount(productOrderDO.getPayAmount());
+        payInfoVO.setPayType(repayOrderRequest.getPayType());
+        payInfoVO.setClientType(repayOrderRequest.getClientType());
+        payInfoVO.setTitle(repayOrderRequest.getPayTitle());
+        payInfoVO.setDescription(repayOrderRequest.getPayTitle());
+        // 设置过期时间(总时间-存活的时间=剩下的有效时间)
+        payInfoVO.setOrderPayTimeMills(TimeConstant.ORDER_PAY_TIMEOUT_MILLS - orderLiveTime);
+        log.info("payInfoVO={}", payInfoVO);
+        String payResult = payFactory.pay(payInfoVO);
+        if (StringUtils.isNotBlank(payResult)) {
+            log.info("创建重新支付订单成功：payInfoVO={}，payResult={}", payInfoVO, payResult);
+            return JsonData.returnJson(BizCodeEnum.OPERATE_SUCCESS, payResult);
+        } else {
+            log.error("创建重新支付订单失败：payInfoVO={}", payInfoVO);
+            return JsonData.returnJson(BizCodeEnum.PAY_ORDER_FAIL);
+        }
     }
 }

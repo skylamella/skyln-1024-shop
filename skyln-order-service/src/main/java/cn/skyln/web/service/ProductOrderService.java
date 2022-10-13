@@ -5,6 +5,7 @@ import cn.skyln.model.OrderCloseMessage;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.DO.ProductOrderDO;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
+import cn.skyln.web.model.REQ.RepayOrderRequest;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -68,4 +69,12 @@ public interface ProductOrderService extends IService<ProductOrderDO> {
      * @return Map
      */
     Map<String, Object> pageProductActivity(int page, int size, String queryType);
+
+    /**
+     * 重新支付订单
+     *
+     * @param repayOrderRequest 重新支付订单对象
+     * @return JsonData
+     */
+    JsonData repayOrder(RepayOrderRequest repayOrderRequest);
 }

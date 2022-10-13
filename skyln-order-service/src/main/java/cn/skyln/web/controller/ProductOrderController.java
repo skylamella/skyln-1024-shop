@@ -4,6 +4,7 @@ package cn.skyln.web.controller;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
+import cn.skyln.web.model.REQ.RepayOrderRequest;
 import cn.skyln.web.service.ProductOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,6 +44,18 @@ public class ProductOrderController {
             writeData(response, jsonData);
         } else {
             log.error("[创建订单失败] {}", jsonData);
+        }
+    }
+
+    @ApiOperation("重新支付订单")
+    @PostMapping("/repay")
+    public void repayOrder(@ApiParam(value = "确认订单对象", required = true) @RequestBody RepayOrderRequest repayOrderRequest,
+                             HttpServletResponse response) {
+        JsonData jsonData = productOrderService.repayOrder(repayOrderRequest);
+        if (jsonData.getCode() == 0) {
+            writeData(response, jsonData);
+        } else {
+            log.error("[重新支付订单失败] {}", jsonData);
         }
     }
 
