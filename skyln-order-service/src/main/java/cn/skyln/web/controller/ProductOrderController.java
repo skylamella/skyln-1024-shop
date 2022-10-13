@@ -1,20 +1,10 @@
 package cn.skyln.web.controller;
 
 
-import cn.skyln.config.AlipayConfig;
-import cn.skyln.config.PayUrlConfig;
 import cn.skyln.enums.BizCodeEnum;
-import cn.skyln.enums.ClientType;
-import cn.skyln.enums.ProductOrderPayTypeEnum;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
 import cn.skyln.web.service.ProductOrderService;
-import com.alibaba.fastjson.JSON;
-import com.alipay.api.AlipayApiException;
-import com.alipay.api.request.AlipayTradePrecreateRequest;
-import com.alipay.api.request.AlipayTradeWapPayRequest;
-import com.alipay.api.response.AlipayTradePrecreateResponse;
-import com.alipay.api.response.AlipayTradeWapPayResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,9 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * <p>
@@ -45,9 +33,6 @@ public class ProductOrderController {
 
     @Autowired
     private ProductOrderService productOrderService;
-
-    @Autowired
-    private PayUrlConfig payUrlConfig;
 
     @ApiOperation("用户下单")
     @PostMapping("/confirm")
@@ -72,6 +57,15 @@ public class ProductOrderController {
     public JsonData queryProductOrderState(@ApiParam(value = "订单号", required = true) @RequestParam("out_trade_no") String outTradeNo) {
         String state = productOrderService.queryProductOrderState(outTradeNo);
         return StringUtils.isBlank(state) ? JsonData.returnJson(BizCodeEnum.ORDER_CONFIRM_NOT_EXIST) : JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, state);
+    }
+
+    @ApiOperation("分页查询我的订单列表")
+    @GetMapping("page_product_order")
+    public JsonData pageProductOrder(@ApiParam(value = "第几页", required = true) @RequestParam(value = "page", defaultValue = "1") int page,
+                                     @ApiParam(value = "一页显示几条", required = true) @RequestParam(value = "size", defaultValue = "8") int size,
+                                     @ApiParam(value = "订单类型", required = true) @RequestParam(value = "query_type", defaultValue = "ALL") String queryType) {
+        Map<String, Object> pageMap = productOrderService.pageProductActivity(page, size, queryType);
+        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, pageMap);
     }
 
     private void writeData(HttpServletResponse response, JsonData jsonData) {

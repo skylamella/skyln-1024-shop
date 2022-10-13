@@ -19,14 +19,13 @@ import cn.skyln.web.model.DO.ProductOrderDO;
 import cn.skyln.web.model.DO.ProductOrderItemDO;
 import cn.skyln.web.model.DTO.*;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
-import cn.skyln.web.model.VO.CouponRecordVO;
-import cn.skyln.web.model.VO.OrderItemVO;
-import cn.skyln.web.model.VO.PayInfoVO;
-import cn.skyln.web.model.VO.ProductOrderAddressVO;
+import cn.skyln.web.model.VO.*;
 import cn.skyln.web.service.ProductOrderService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -491,5 +490,35 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             // todo 微信支付
         }
         return JsonData.returnJson(BizCodeEnum.PAY_ORDER_CALLBACK_NOT_SUCCESS);
+    }
+
+    /**
+     * 分页查看订单列表
+     *
+     * @param page      第几页
+     * @param size      一页显示几条
+     * @param queryType 订单类型
+     * @return Map
+     */
+    @Override
+    public Map<String, Object> pageProductActivity(int page, int size, String queryType) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        QueryWrapper<ProductOrderDO> wrapper = new QueryWrapper<ProductOrderDO>().eq("user_id", loginUser.getId());
+        if (StringUtils.isNotBlank(queryType) && !StringUtils.equalsIgnoreCase("ALL", queryType)) {
+            wrapper.eq("state", queryType);
+        }
+        Page<ProductOrderDO> pageInfo = new Page<>(page, size);
+        IPage<ProductOrderDO> productOrderDOPage = productOrderMapper.selectPage(pageInfo, wrapper);
+        return CommonUtils.getReturnPageMap(productOrderDOPage.getTotal(),
+                productOrderDOPage.getPages(),
+                productOrderDOPage.getRecords().stream().map(obj -> {
+                    ProductOrderVO productOrderVO = (ProductOrderVO) CommonUtils.beanProcess(obj, new ProductOrderVO());
+                    List<ProductOrderItemDO> list = orderItemMapper.selectList(new QueryWrapper<ProductOrderItemDO>().eq("product_order_id", obj.getId()));
+                    List<OrderItemVO> collect = list.stream()
+                            .map(orderItemDO -> (OrderItemVO) CommonUtils.beanProcess(orderItemDO, new OrderItemVO()))
+                            .collect(Collectors.toList());
+                    productOrderVO.setOrderItemVOList(collect);
+                    return productOrderVO;
+                }).collect(Collectors.toList()));
     }
 }

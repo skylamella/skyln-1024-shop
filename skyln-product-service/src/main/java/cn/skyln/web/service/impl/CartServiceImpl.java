@@ -135,6 +135,12 @@ public class CartServiceImpl implements CartService {
         myCart.delete(String.valueOf(productId));
     }
 
+    private void deleteItem(long productId, long userId) {
+        // 获取购物车
+        BoundHashOperations<String, Object, Object> myCart = getMyCartOps(userId);
+        myCart.delete(String.valueOf(productId));
+    }
+
     /**
      * 修改购物项
      *
@@ -160,6 +166,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<CartItemVO> confirmOrderCartItems(CartDTO cartDTO) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
         // 获取购物车的全部购物项
         List<CartItemVO> cartItemVOList = buildCartItemList(true);
         List<Long> productIdList = cartDTO.getProductIdList();
@@ -169,6 +176,7 @@ public class CartServiceImpl implements CartService {
                 CartMessage cartMessage = new CartMessage();
                 cartMessage.setOutTradeNo(cartDTO.getOrderOutTradeNo());
                 cartMessage.setProductId(obj.getProductId());
+                cartMessage.setUserId(loginUser.getId());
                 rabbitTemplate.convertAndSend(rabbitMQConfig.getCartEventExchange(),
                         rabbitMQConfig.getCartReleaseDelayRoutingKey(),
                         cartMessage);
@@ -207,7 +215,7 @@ public class CartServiceImpl implements CartService {
             // 状态是已经支付
             if (StringUtils.equalsIgnoreCase(ProductOrderStateEnum.PAY.name(), state)) {
                 // 清空购物车
-                this.deleteItem(productId);
+                this.deleteItem(productId, cartMessage.getUserId());
                 log.info("订单已经支付，清空购物车对应购物项：{}", cartMessage);
                 return true;
             }
@@ -270,6 +278,10 @@ public class CartServiceImpl implements CartService {
         return String.format(CacheKey.CART_KEY, loginUser.getId());
     }
 
+    private String getCartKey(Long userId) {
+        return String.format(CacheKey.CART_KEY, userId);
+    }
+
     /**
      * 我的购物车
      *
@@ -277,6 +289,11 @@ public class CartServiceImpl implements CartService {
      */
     private BoundHashOperations<String, Object, Object> getMyCartOps() {
         String cartKey = getCartKey();
+        return redisTemplate.boundHashOps(cartKey);
+    }
+
+    private BoundHashOperations<String, Object, Object> getMyCartOps(Long userId) {
+        String cartKey = getCartKey(userId);
         return redisTemplate.boundHashOps(cartKey);
     }
 }

@@ -58,4 +58,14 @@ public interface ProductOrderService extends IService<ProductOrderDO> {
      * @return JsonData
      */
     JsonData handlerOrderCallbackMsg(ProductOrderPayTypeEnum payType, Map<String, String> paramsMap);
+
+    /**
+     * 分页查看订单列表
+     *
+     * @param page      第几页
+     * @param size      一页显示几条
+     * @param queryType 订单类型
+     * @return Map
+     */
+    Map<String, Object> pageProductActivity(int page, int size, String queryType);
 }

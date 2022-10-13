@@ -22,4 +22,8 @@ public class CartMessage {
      * 商品ID列表
      */
     private Long productId;
+    /**
+     * 用户ID
+     */
+    private Long userId;
 }
