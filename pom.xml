@@ -16,6 +16,7 @@
         <module>skyln-order-service</module>
         <module>skyln-coupon-service</module>
         <module>skyln-api-gateway</module>
+        <module>skyln-xxl-job</module>
     </modules>
 
     <properties>
