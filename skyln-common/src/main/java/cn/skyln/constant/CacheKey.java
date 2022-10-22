@@ -25,4 +25,9 @@ public class CacheKey {
      * MQ缓存key，%s是占位符，第一个是业务类型，第二个是内容ID
      */
     public static final String MQ_KEY = "mq:%s:%s";
+
+    /**
+     * 提交表单的token key，%s是占位符，第一个是用户ID
+     */
+    public static final String SUBMIT_ORDER_TOKEN_KEY = "order:submit:%s";
 }

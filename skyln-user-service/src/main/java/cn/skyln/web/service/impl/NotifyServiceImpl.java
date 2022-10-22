@@ -1,6 +1,7 @@
 package cn.skyln.web.service.impl;
 
 import cn.skyln.constant.CacheKey;
+import cn.skyln.constant.TimeConstant;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.enums.SendCodeEnum;
 import cn.skyln.utils.CheckUtil;
@@ -32,10 +33,6 @@ public class NotifyServiceImpl implements NotifyService {
 
     private static final String SUBJECT = "skyln1024商城验证码";
     private static final String CONTENT = "欢迎\"%s\"注册skyln1024商城，您的验证码是\"%s\"，有效期10分钟，请勿向他人透漏验证码。";
-    /**
-     * 10分钟有效
-     */
-    private static final long CAPTCHA_CODE_EXPIRED = 10;
 
     /**
      * 发送验证码邮件
@@ -61,7 +58,7 @@ public class NotifyServiceImpl implements NotifyService {
         }
         String code = CommonUtils.getRandomCode(6);
         String value = code + "_" + CommonUtils.getCurrentTimeStamp();
-        redisTemplate.opsForValue().set(cacheKey, value, CAPTCHA_CODE_EXPIRED, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(cacheKey, value, TimeConstant.CAPTCHA_CODE_EXPIRED, TimeUnit.MINUTES);
         if (CheckUtil.isEmail(to)) {
             mailComponent.sendSimpleMail(to, SUBJECT, String.format(CONTENT, to, code));
             log.info("{}的验证码发送成功！", to);

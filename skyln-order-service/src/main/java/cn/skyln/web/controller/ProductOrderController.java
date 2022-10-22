@@ -1,7 +1,12 @@
 package cn.skyln.web.controller;
 
 
+import cn.skyln.constant.CacheKey;
+import cn.skyln.constant.TimeConstant;
 import cn.skyln.enums.BizCodeEnum;
+import cn.skyln.interceptor.LoginInterceptor;
+import cn.skyln.model.LoginUser;
+import cn.skyln.utils.CommonUtils;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.model.REQ.ConfirmOrderRequest;
 import cn.skyln.web.model.REQ.RepayOrderRequest;
@@ -12,11 +17,13 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -35,6 +42,9 @@ public class ProductOrderController {
     @Autowired
     private ProductOrderService productOrderService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @ApiOperation("用户下单")
     @PostMapping("/confirm")
     public void confirmOrder(@ApiParam(value = "确认订单对象", required = true) @RequestBody ConfirmOrderRequest confirmOrderRequest,
@@ -49,7 +59,7 @@ public class ProductOrderController {
     @ApiOperation("重新支付订单")
     @PostMapping("/repay")
     public void repayOrder(@ApiParam(value = "确认订单对象", required = true) @RequestBody RepayOrderRequest repayOrderRequest,
-                             HttpServletResponse response) {
+                           HttpServletResponse response) {
         JsonData jsonData = productOrderService.repayOrder(repayOrderRequest);
         if (jsonData.getCode() != 0) {
             log.error("[重新支付订单失败] {}", jsonData);
@@ -77,6 +87,16 @@ public class ProductOrderController {
                                      @ApiParam(value = "订单类型", required = true) @RequestParam(value = "query_type", defaultValue = "ALL") String queryType) {
         Map<String, Object> pageMap = productOrderService.pageProductActivity(page, size, queryType);
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, pageMap);
+    }
+
+    @ApiOperation("获取提交订单令牌")
+    @GetMapping("get_order_token")
+    public JsonData getOrderToken() {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String key = String.format(CacheKey.SUBMIT_ORDER_TOKEN_KEY, loginUser.getId());
+        String token = CommonUtils.getRandomCode(32);
+        redisTemplate.opsForValue().set(key,token, TimeConstant.EXPIRATION_TIME_MINUTE, TimeUnit.MINUTES);
+        return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, token);
     }
 
     private void writeData(HttpServletResponse response, JsonData jsonData) {

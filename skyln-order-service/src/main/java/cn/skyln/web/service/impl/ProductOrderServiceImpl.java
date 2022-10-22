@@ -8,6 +8,7 @@ import cn.skyln.exception.BizException;
 import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.LoginUser;
 import cn.skyln.model.OrderCloseMessage;
+import cn.skyln.utils.CheckUtil;
 import cn.skyln.utils.CommonUtils;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.feignClient.CouponFeignService;
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,6 +80,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     @Autowired
     private PayFactory payFactory;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     /**
      * 创建订单
      * <p>
@@ -101,6 +106,10 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     @Transactional
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
+
+        // 下单token防重校验
+        CheckUtil.checkOrderToken(confirmOrderRequest.getToken(), log, redisTemplate, loginUser.getId());
+
         String orderOutTradeNo = CommonUtils.getRandomCode(32);
         // 获取用户的收货地址
         ProductOrderAddressVO addressVO = this.getUserAddress(confirmOrderRequest.getAddressId());
@@ -535,6 +544,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     @Transactional
     public JsonData repayOrder(RepayOrderRequest repayOrderRequest) {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        // 下单token防重校验
+        CheckUtil.checkOrderToken(repayOrderRequest.getToken(), log, redisTemplate, loginUser.getId());
+
         String orderOutTradeNo = repayOrderRequest.getOrderOutTradeNo();
         ProductOrderDO productOrderDO = productOrderMapper.selectOne(new QueryWrapper<ProductOrderDO>()
                 .eq("user_id", loginUser.getId())
@@ -555,7 +567,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             log.error("订单支付超时：{}", repayOrderRequest);
             return JsonData.returnJson(BizCodeEnum.PAY_ORDER_PAY_TIMEOUT);
         }
-        if(!StringUtils.equalsIgnoreCase(productOrderDO.getPayType(),repayOrderRequest.getPayType())){
+        if (!StringUtils.equalsIgnoreCase(productOrderDO.getPayType(), repayOrderRequest.getPayType())) {
             // 更新订单支付信息
             productOrderDO.setPayType(repayOrderRequest.getPayType());
             productOrderDO.setUpdateTime(new Date());

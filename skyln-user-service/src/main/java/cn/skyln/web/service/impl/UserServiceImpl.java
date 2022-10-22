@@ -1,5 +1,6 @@
 package cn.skyln.web.service.impl;
 
+import cn.skyln.constant.TimeConstant;
 import cn.skyln.enums.BizCodeEnum;
 import cn.skyln.enums.SendCodeEnum;
 import cn.skyln.interceptor.LoginInterceptor;
@@ -55,11 +56,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     private RedisTemplate<String, String> redisTemplate;
     @Autowired
     private CouponFeignService couponFeignService;
-
-    /**
-     * 24小时有效
-     */
-    private static final long CODE_EXPIRED = 24;
 
     @Override
     public UserDO getOneByMail(String mail) {
@@ -204,7 +200,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 token = JWTUtils.generateToken(loginUser, RsaUtils.getPrivateKey());
                 refreshToken = JWTUtils.generateRefreshToken(loginUser, RsaUtils.getPrivateKey());
             }
-            redisTemplate.opsForValue().set(token, refreshToken, CODE_EXPIRED, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(token, refreshToken, TimeConstant.EXPIRATION_TIME_HOUR, TimeUnit.HOURS);
             log.info("[{}] \"{}\"{}",
                     BizCodeEnum.LOGIN_SUCCESS.getCode(),
                     userLoginRequest.getMail(),

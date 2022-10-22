@@ -1,10 +1,16 @@
 package cn.skyln.utils;
 
+import cn.skyln.constant.CacheKey;
+import cn.skyln.enums.BizCodeEnum;
+import cn.skyln.exception.BizException;
 import com.rabbitmq.client.Channel;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,5 +103,31 @@ public class CheckUtil {
             channel.basicReject(msgTag, true);
         }
         return retryNums;
+    }
+
+    /**
+     * 防重下单token校验
+     *
+     * @param orderToken    下单token
+     * @param log           sl4j日志
+     * @param redisTemplate redisTemplate
+     * @param loginUserId   登录用户ID
+     */
+    public static void checkOrderToken(String orderToken,
+                                       Logger log,
+                                       RedisTemplate redisTemplate,
+                                       Long loginUserId) {
+        if (StringUtils.isBlank(orderToken)) {
+            log.error("用户下单令牌不存在");
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_TOKEN_NOT_EXIST);
+        }
+        String script = "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
+        String key = String.format(CacheKey.SUBMIT_ORDER_TOKEN_KEY, loginUserId);
+        Long result = (Long) redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), List.of(key), orderToken);
+        assert result != null;
+        if (result == 0L) {
+            log.error("用户下单订单令牌不正确：{}", orderToken);
+            throw new BizException(BizCodeEnum.ORDER_CONFIRM_TOKEN_EQUAL_FAIL);
+        }
     }
 }

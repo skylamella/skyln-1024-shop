@@ -1,5 +1,6 @@
 package cn.skyln.utils;
 
+import cn.skyln.constant.TimeConstant;
 import cn.skyln.model.LoginUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -17,11 +18,6 @@ import java.util.UUID;
  * JWT工具类，采用RSA进行加解密
  */
 public class JWTUtils {
-
-    /**
-     * 过期时间，30分钟
-     */
-    private static final int EXPIRE = 30;
 
     /**
      * 刷新token时间，1天
@@ -50,7 +46,7 @@ public class JWTUtils {
                 .setId(createJTI())
                 .setIssuedAt(new Date())
                 // todo 测试使用设置为30天
-                .setExpiration(DateTime.now().plusDays(EXPIRE).toDate())
+                .setExpiration(DateTime.now().plusDays(Math.toIntExact(TimeConstant.EXPIRATION_TIME_MINUTE)).toDate())
                 .signWith(SignatureAlgorithm.RS256, privateKey)
                 .compact();
     }
@@ -74,7 +70,7 @@ public class JWTUtils {
                 .setId(createJTI())
                 .setIssuedAt(new Date())
                 // todo 测试使用设置为30天
-                .setExpiration(DateTime.now().plusDays(EXPIRE).toDate())
+                .setExpiration(DateTime.now().plusDays(Math.toIntExact(TimeConstant.EXPIRATION_TIME_MINUTE)).toDate())
                 .signWith(SignatureAlgorithm.RS256, privateKey)
                 .compact();
     }
@@ -92,7 +88,7 @@ public class JWTUtils {
                 .setClaims(claims)
                 .setId(createJTI())
                 .setIssuedAt(new Date())
-                .setExpiration(DateTime.now().plusMinutes(EXPIRE).toDate())
+                .setExpiration(DateTime.now().plusMinutes(Math.toIntExact(TimeConstant.EXPIRATION_TIME_MINUTE)).toDate())
                 .signWith(SignatureAlgorithm.RS256, privateKey)
                 .compact();
     }
@@ -113,7 +109,7 @@ public class JWTUtils {
                 .claim("mail", user.getMail())
                 .setId(createJTI())
                 .setIssuedAt(new Date())
-                .setExpiration(DateTime.now().plusHours(REFRESH_EXPIRE).toDate())
+                .setExpiration(DateTime.now().plusHours(Math.toIntExact(TimeConstant.EXPIRATION_TIME_HOUR)).toDate())
                 .signWith(SignatureAlgorithm.RS256, privateKey)
                 .compact();
     }
@@ -136,7 +132,7 @@ public class JWTUtils {
                 .claim("mail", user.getMail())
                 .setId(createJTI())
                 .setIssuedAt(new Date())
-                .setExpiration(DateTime.now().plusHours(REFRESH_EXPIRE).toDate())
+                .setExpiration(DateTime.now().plusHours(Math.toIntExact(TimeConstant.EXPIRATION_TIME_HOUR)).toDate())
                 .signWith(SignatureAlgorithm.RS256, privateKey)
                 .compact();
     }
