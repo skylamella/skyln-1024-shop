@@ -40,11 +40,10 @@ public class ProductOrderController {
     public void confirmOrder(@ApiParam(value = "确认订单对象", required = true) @RequestBody ConfirmOrderRequest confirmOrderRequest,
                              HttpServletResponse response) {
         JsonData jsonData = productOrderService.confirmOrder(confirmOrderRequest);
-        if (jsonData.getCode() == 0) {
-            writeData(response, jsonData);
-        } else {
+        if (jsonData.getCode() != 0) {
             log.error("[创建订单失败] {}", jsonData);
         }
+        writeData(response, jsonData);
     }
 
     @ApiOperation("重新支付订单")
@@ -52,11 +51,10 @@ public class ProductOrderController {
     public void repayOrder(@ApiParam(value = "确认订单对象", required = true) @RequestBody RepayOrderRequest repayOrderRequest,
                              HttpServletResponse response) {
         JsonData jsonData = productOrderService.repayOrder(repayOrderRequest);
-        if (jsonData.getCode() == 0) {
-            writeData(response, jsonData);
-        } else {
+        if (jsonData.getCode() != 0) {
             log.error("[重新支付订单失败] {}", jsonData);
         }
+        writeData(response, jsonData);
     }
 
     /**
@@ -92,4 +90,3 @@ public class ProductOrderController {
     }
 
 }
-
