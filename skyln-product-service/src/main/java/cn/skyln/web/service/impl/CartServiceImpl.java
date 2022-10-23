@@ -112,7 +112,11 @@ public class CartServiceImpl implements CartService {
     public void clear() {
         String cartKey = getCartKey();
         if (redisTemplate.hasKey(cartKey)) {
-            redisTemplate.delete(cartKey);
+            BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
+            List<Object> itemList = myCart.values();
+            if (Objects.nonNull(itemList) && !itemList.isEmpty()) {
+                itemList.forEach(item -> deleteItem((String) item, myCart));
+            }
         } else {
             throw new BizException(BizCodeEnum.CART_NOT_EXIT);
         }
@@ -153,11 +157,14 @@ public class CartServiceImpl implements CartService {
     }
 
     private void deleteItem(long productId, BoundHashOperations<String, Object, Object> myCart) {
-        String result = (String) myCart.get(String.valueOf(productId));
+        deleteItem((String) myCart.get(String.valueOf(productId)), myCart);
+    }
+
+    private void deleteItem(String result, BoundHashOperations<String, Object, Object> myCart) {
         if (StringUtils.isNotBlank(result)) {
             CartItemVO cartItemVO = JSON.parseObject(result, CartItemVO.class);
             cartItemVO.setDelStatue(true);
-            myCart.put(String.valueOf(productId), JSON.toJSONString(cartItemVO));
+            myCart.put(String.valueOf(cartItemVO.getProductId()), JSON.toJSONString(cartItemVO));
         }
     }
 
@@ -371,10 +378,6 @@ public class CartServiceImpl implements CartService {
         return String.format(CacheKey.CART_KEY, loginUser.getId());
     }
 
-    private String getCartKey(Long userId) {
-        return String.format(CacheKey.CART_KEY, userId);
-    }
-
     /**
      * 我的购物车
      *
@@ -386,7 +389,7 @@ public class CartServiceImpl implements CartService {
     }
 
     private BoundHashOperations<String, Object, Object> getMyCartOps(Long userId) {
-        String cartKey = getCartKey(userId);
+        String cartKey = String.format(CacheKey.CART_KEY, userId);
         return redisTemplate.boundHashOps(cartKey);
     }
 }
