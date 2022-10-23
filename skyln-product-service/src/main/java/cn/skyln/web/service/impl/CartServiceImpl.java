@@ -185,7 +185,7 @@ public class CartServiceImpl implements CartService {
         if (cartItemRequest.getBuyNum() < 0) {
             throw new BizException(BizCodeEnum.CART_UPD_NUM_FAIL);
         } else if (cartItemRequest.getBuyNum() == 0) {
-            deleteItem(cartItemRequest.getProductId());
+            deleteItem(cartItemRequest.getProductId(), myCart);
         }
         cartItemVO.setBuyNum(cartItemRequest.getBuyNum());
         myCart.put(String.valueOf(cartItemRequest.getProductId()), JSON.toJSONString(cartItemVO));
@@ -325,8 +325,6 @@ public class CartServiceImpl implements CartService {
                 // 获取redis购物项
                 List<Object> itemList = cart.values();
                 if (Objects.nonNull(itemList) && !itemList.isEmpty()) {
-                    List<Long> productIdList = new ArrayList<>();
-                    List<CartItemVO> cartItemVOList = new ArrayList<>();
                     CartDO finalCartDO = cartDO;
                     List<CartItemDO> cartItemList = new ArrayList<>();
                     // 循环处理redis中的购物项
@@ -344,21 +342,22 @@ public class CartServiceImpl implements CartService {
                             // 从redis中彻底移除该购物项
                             cart.delete(String.valueOf(cartItemVO.getProductId()));
                         } else {
-                            cartItemVOList.add(cartItemVO);
-                            productIdList.add(cartItemVO.getProductId());
+                            ProductDetailVO productDetailVO = productService.findDetailById(cartItemVO.getProductId());
+                            cartItemVO.setAmount(productDetailVO.getAmount());
+                            cartItemVO.setProductTitle(productDetailVO.getTitle());
+                            cartItemVO.setProductImg(productDetailVO.getCoverImg());
+                            cart.put(String.valueOf(cartItemVO.getProductId()), JSON.toJSONString(cartItemVO));
                             if (Objects.isNull(cartItemDO)) {
                                 // 数据库中不存在该购物项，则创建一个购物项
                                 cartItemDO = (CartItemDO) CommonUtils.beanProcess(cartItemVO, new CartItemDO());
                                 cartItemDO.setCartId(finalCartDO.getId());
-                                cartItemMapper.updateById(cartItemDO);
+                                cartItemList.add(cartItemDO);
                             } else {
                                 BeanUtils.copyProperties(cartItemVO, cartItemDO);
-                                cartItemList.add(cartItemDO);
+                                cartItemMapper.updateById(cartItemDO);
                             }
                         }
                     });
-                    // 更新redis中购物车的最新价格
-                    setProductLatestAmount(cartItemVOList, productIdList);
                     // 将购物车数据批量插入mysql
                     cartItemMapper.insertBatch(cartItemList);
                 }
