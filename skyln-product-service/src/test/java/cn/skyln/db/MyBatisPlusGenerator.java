@@ -62,7 +62,7 @@ public class MyBatisPlusGenerator {
                 .setRestControllerStyle(true)
                 // 生成的表, 支持多表一起生成，以数组形式填写
                 //TODO  TODO  TODO  TODO
-                .setInclude("product_task");
+                .setInclude("cart","cart_item");
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
         pkConfig.setParent("cn.skyln.web")

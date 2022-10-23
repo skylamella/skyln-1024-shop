@@ -82,4 +82,10 @@ public class CartController {
         return JsonData.returnJson(BizCodeEnum.SEARCH_SUCCESS, cartItemVOList);
     }
 
+    @ApiOperation("XXL-JOB-RPC-定时将redis中的购物车存入数据库")
+    @PostMapping("redis_cart_to_mysql")
+    public Integer redisCart2MysqlCart(){
+        return cartService.redisCart2MysqlCart();
+    }
+
 }

@@ -59,6 +59,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
         excludePathPatternsList.add("/api/*/product/page_product");
         // 查询商品详情接口
         excludePathPatternsList.add("/api/*/product/detail/*");
+        // XXL-JOB-RPC-定时将redis中的购物车存入数据库
+        excludePathPatternsList.add("/api/*/cart/redis_cart_to_mysql");
         return excludePathPatternsList;
     }
 }

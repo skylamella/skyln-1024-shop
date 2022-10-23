@@ -46,6 +46,12 @@ public class CartItemVO {
     @JsonProperty("total_amount")
     private BigDecimal totalAmount;
 
+    /**
+     * 是否删除标识
+     */
+    @JsonProperty("del_statue")
+    private boolean delStatue;
+
     public long getProductId() {
         return productId;
     }
@@ -88,5 +94,13 @@ public class CartItemVO {
 
     public BigDecimal getTotalAmount() {
         return this.amount.multiply(new BigDecimal(this.buyNum));
+    }
+
+    public boolean isDelStatue() {
+        return delStatue;
+    }
+
+    public void setDelStatue(boolean delStatue) {
+        this.delStatue = delStatue;
     }
 }

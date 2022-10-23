@@ -8,8 +8,13 @@ import cn.skyln.exception.BizException;
 import cn.skyln.interceptor.LoginInterceptor;
 import cn.skyln.model.CartMessage;
 import cn.skyln.model.LoginUser;
+import cn.skyln.utils.CommonUtils;
 import cn.skyln.utils.JsonData;
 import cn.skyln.web.feignClient.ProductOrderFeignService;
+import cn.skyln.web.mapper.CartItemMapper;
+import cn.skyln.web.mapper.CartMapper;
+import cn.skyln.web.model.DO.CartDO;
+import cn.skyln.web.model.DO.CartItemDO;
 import cn.skyln.web.model.DTO.CartDTO;
 import cn.skyln.web.model.REQ.CartItemRequest;
 import cn.skyln.web.model.VO.CartItemVO;
@@ -18,18 +23,17 @@ import cn.skyln.web.model.VO.ProductDetailVO;
 import cn.skyln.web.service.CartService;
 import cn.skyln.web.service.ProductService;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -56,6 +60,12 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     private RabbitMQConfig rabbitMQConfig;
+
+    @Autowired
+    private CartMapper cartMapper;
+
+    @Autowired
+    private CartItemMapper cartItemMapper;
 
     /**
      * 添加商品到购物车
@@ -85,6 +95,7 @@ public class CartServiceImpl implements CartService {
             cartItemVO.setProductImg(productDetail.getCoverImg());
             cartItemVO.setProductTitle(productDetail.getTitle());
             cartItemVO.setAmount(productDetail.getAmount());
+            cartItemVO.setDelStatue(false);
             myCart.put(String.valueOf(productId), JSON.toJSONString(cartItemVO));
         } else {
             // 存在商品，修改数量
@@ -132,13 +143,22 @@ public class CartServiceImpl implements CartService {
     public void deleteItem(long productId) {
         // 获取购物车
         BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
-        myCart.delete(String.valueOf(productId));
+        deleteItem(productId, myCart);
     }
 
     private void deleteItem(long productId, long userId) {
         // 获取购物车
         BoundHashOperations<String, Object, Object> myCart = getMyCartOps(userId);
-        myCart.delete(String.valueOf(productId));
+        deleteItem(productId, myCart);
+    }
+
+    private void deleteItem(long productId, BoundHashOperations<String, Object, Object> myCart) {
+        String result = (String) myCart.get(String.valueOf(productId));
+        if (StringUtils.isNotBlank(result)) {
+            CartItemVO cartItemVO = JSON.parseObject(result, CartItemVO.class);
+            cartItemVO.setDelStatue(true);
+            myCart.put(String.valueOf(productId), JSON.toJSONString(cartItemVO));
+        }
     }
 
     /**
@@ -237,12 +257,16 @@ public class CartServiceImpl implements CartService {
         List<CartItemVO> cartItemVOList = new ArrayList<>();
         // 拼接ID列表查询最新价格
         List<Long> productIdList = new ArrayList<>();
-        for (Object item : itemList) {
-            CartItemVO cartItemVO = JSON.parseObject((String) item, CartItemVO.class);
-            cartItemVOList.add(cartItemVO);
-            productIdList.add(cartItemVO.getProductId());
+        if (Objects.nonNull(itemList) && !itemList.isEmpty()) {
+            itemList.forEach(item -> {
+                CartItemVO cartItemVO = JSON.parseObject((String) item, CartItemVO.class);
+                if (!cartItemVO.isDelStatue()) {
+                    cartItemVOList.add(cartItemVO);
+                    productIdList.add(cartItemVO.getProductId());
+                }
+            });
         }
-        if (latestAmount) {
+        if (latestAmount && !cartItemVOList.isEmpty() && !productIdList.isEmpty()) {
             setProductLatestAmount(cartItemVOList, productIdList);
         }
         return cartItemVOList;
@@ -260,12 +284,81 @@ public class CartServiceImpl implements CartService {
         // 根据ID分组
         Map<Long, ProductDetailVO> productDetailVOMap = productDetailVOList.stream().collect(Collectors.toMap(ProductDetailVO::getId, Function.identity()));
 
-        cartItemVOList.stream().forEach(item -> {
+        cartItemVOList.forEach(item -> {
             ProductDetailVO productDetailVO = productDetailVOMap.get(item.getProductId());
             item.setAmount(productDetailVO.getAmount());
             item.setProductTitle(productDetailVO.getTitle());
             item.setProductImg(productDetailVO.getCoverImg());
         });
+    }
+
+    /**
+     * redis中的购物车数据转移到mysql中
+     *
+     * @return 购物车数据转移结果
+     */
+    @Override
+    public Integer redisCart2MysqlCart() {
+        // 批量获取购物车的key
+        Set<String> keys = redisTemplate.keys("cart:*");
+        if (Objects.nonNull(keys) && !keys.isEmpty()) {
+            keys.forEach(key -> {
+                // 根据redis_cart_key获取用户ID
+                Long userId = Long.valueOf(key.split(":")[1]);
+                // 根据用户ID获取mysql购物车
+                CartDO cartDO = cartMapper.selectOne(new QueryWrapper<CartDO>().eq("user_id", userId));
+                if (Objects.isNull(cartDO)) {
+                    // 用户不存在购物车时将自动创建mysql购物车
+                    cartDO = new CartDO();
+                    cartDO.setUserId(userId);
+                    cartMapper.insert(cartDO);
+                }
+                // 根据用户ID获取redis购物车
+                BoundHashOperations<String, Object, Object> cart = getMyCartOps(userId);
+                // 获取redis购物项
+                List<Object> itemList = cart.values();
+                if (Objects.nonNull(itemList) && !itemList.isEmpty()) {
+                    List<Long> productIdList = new ArrayList<>();
+                    List<CartItemVO> cartItemVOList = new ArrayList<>();
+                    CartDO finalCartDO = cartDO;
+                    List<CartItemDO> cartItemList = new ArrayList<>();
+                    // 循环处理redis中的购物项
+                    itemList.forEach(item -> {
+                        CartItemVO cartItemVO = JSON.parseObject((String) item, CartItemVO.class);
+                        CartItemDO cartItemDO = cartItemMapper.selectOne(new QueryWrapper<CartItemDO>()
+                                .eq("product_id", cartItemVO.getProductId())
+                                .eq("cart_id", finalCartDO.getId()));
+                        // 判断是否为删除掉的购物车
+                        if (cartItemVO.isDelStatue()) {
+                            // 如果mysql中存在该购物项则删除mysql中的记录
+                            if (Objects.nonNull(cartItemDO)) {
+                                cartItemMapper.deleteById(cartItemDO.getId());
+                            }
+                            // 从redis中彻底移除该购物项
+                            cart.delete(String.valueOf(cartItemVO.getProductId()));
+                        } else {
+                            cartItemVOList.add(cartItemVO);
+                            productIdList.add(cartItemVO.getProductId());
+                            if (Objects.isNull(cartItemDO)) {
+                                // 数据库中不存在该购物项，则创建一个购物项
+                                cartItemDO = (CartItemDO) CommonUtils.beanProcess(cartItemVO, new CartItemDO());
+                                cartItemDO.setCartId(finalCartDO.getId());
+                                cartItemMapper.updateById(cartItemDO);
+                            } else {
+                                BeanUtils.copyProperties(cartItemVO, cartItemDO);
+                                cartItemList.add(cartItemDO);
+                            }
+                        }
+                    });
+                    // 更新redis中购物车的最新价格
+                    setProductLatestAmount(cartItemVOList, productIdList);
+                    // 将购物车数据批量插入mysql
+                    cartItemMapper.insertBatch(cartItemList);
+                }
+            });
+            return 1;
+        }
+        return 0;
     }
 
     /**

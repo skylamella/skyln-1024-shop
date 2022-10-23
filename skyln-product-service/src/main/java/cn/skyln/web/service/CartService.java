@@ -63,4 +63,11 @@ public interface CartService {
      * @return 清理结果
      */
     boolean cleanCartRecord(CartMessage cartMessage);
+
+    /**
+     * redis中的购物车数据转移到mysql中
+     *
+     * @return 购物车数据转移结果
+     */
+    Integer redisCart2MysqlCart();
 }

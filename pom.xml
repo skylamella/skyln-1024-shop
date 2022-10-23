@@ -41,6 +41,7 @@
         <jwt.version>0.7.0</jwt.version>
         <joda.time.version>2.10.13</joda.time.version>
         <redisson.version>3.10.1</redisson.version>
+        <xxl.job.core.version>2.3.0</xxl.job.core.version>
 
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
@@ -145,6 +146,13 @@
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson</artifactId>
                 <version>${redisson.version}</version>
+            </dependency>
+
+            <!--xxl-job-core-->
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxl.job.core.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
