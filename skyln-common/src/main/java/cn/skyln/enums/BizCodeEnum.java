@@ -138,11 +138,11 @@ public enum BizCodeEnum {
     /**
      * 流控
      */
-    CONTROL_FLOW_EXCEPTION(320001, "已触发限流，请稍后再次尝试。"),
-    CONTROL_DEGRADE_EXCEPTION(320002, "已触发降级，请稍后再次尝试。"),
-    CONTROL_PARAM_FLOW_EXCEPTION(320003, "热点参数异常，已触发流量控制，请稍后再次尝试。"),
-    CONTROL_SYSTEM_BLOCK_EXCEPTION(320004, "系统规则异常，已触发流量控制，请稍后再次尝试。"),
-    CONTROL_AUTHORITY_EXCEPTION(320005, "认证异常，已触发流量控制，请稍后再次尝试。");
+    CONTROL_FLOW_EXCEPTION(320001, "限流异常，已触发流量控制，请稍后再次尝试。"),
+    CONTROL_DEGRADE_EXCEPTION(320002, "降级异常，已触发流量控制，请稍后再次尝试。"),
+    CONTROL_PARAM_FLOW_EXCEPTION(320003, "参数限流异常，已触发流量控制，请稍后再次尝试。"),
+    CONTROL_SYSTEM_BLOCK_EXCEPTION(320004, "系统负载异常，已触发流量控制，请稍后再次尝试。"),
+    CONTROL_AUTHORITY_EXCEPTION(320005, "授权异常，已触发流量控制，请稍后再次尝试。");
 
     // 系统枚举结束
 
