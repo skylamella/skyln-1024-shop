@@ -60,6 +60,7 @@ public class JWTUtils {
      * @return java.lang.String
      */
     public static String generateToken(LoginUser user, PrivateKey privateKey, String ip) {
+        if (StringUtils.isBlank(ip)) return generateToken(user, privateKey);
         return Jwts.builder()
                 .setSubject(SUBJECT)
                 .claim("head_img", user.getHeadImg())
@@ -123,6 +124,7 @@ public class JWTUtils {
      * @return java.lang.String
      */
     public static String generateRefreshToken(LoginUser user, PrivateKey privateKey, String ip) {
+        if (StringUtils.isBlank(ip)) return generateRefreshToken(user, privateKey);
         return Jwts.builder()
                 .setSubject(SUBJECT)
                 .claim("head_img", user.getHeadImg())

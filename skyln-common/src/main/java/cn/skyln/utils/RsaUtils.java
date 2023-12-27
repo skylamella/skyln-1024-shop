@@ -1,5 +1,7 @@
 package cn.skyln.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -106,11 +108,12 @@ public class RsaUtils {
         Files.write(dest.toPath(), bytes);
     }
 
-    private static String setFolder(){
+    private static String setFolder() {
         StringBuilder sb = new StringBuilder();
         String separator = File.separator;
-        String userHome = System.getProperty("user.home");
-        sb.append(userHome).append(separator).append("rsa").append(separator);
+        String osName = System.getProperty("os.name");
+        String basePath = (StringUtils.isNotBlank(osName) && !osName.startsWith("Windows")) ? separator + "root" : System.getProperty("user.home");
+        sb.append(basePath).append(separator).append("rsa").append(separator);
         return sb.toString();
     }
 }

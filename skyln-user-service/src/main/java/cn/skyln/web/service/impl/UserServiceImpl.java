@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.PrivateKey;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -190,16 +191,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         LoginUser loginUser = new LoginUser();
         BeanUtils.copyProperties(userDO, loginUser);
         try {
-            String token;
-            String refreshToken;
+            PrivateKey privateKey = RsaUtils.getPrivateKey();
+            String ipAddr = userLoginRequest.getSafeMode() == 1 ? CommonUtils.getIpAddr(request) : "";
+            String token = JWTUtils.generateToken(loginUser, privateKey, ipAddr);
+            String refreshToken = JWTUtils.generateRefreshToken(loginUser, privateKey, ipAddr);
             // 1：开启安全模式
-            if (userLoginRequest.getSafeMode() == 1) {
-                token = JWTUtils.generateToken(loginUser, RsaUtils.getPrivateKey(), CommonUtils.getIpAddr(request));
-                refreshToken = JWTUtils.generateRefreshToken(loginUser, RsaUtils.getPrivateKey(), CommonUtils.getIpAddr(request));
-            } else {
-                token = JWTUtils.generateToken(loginUser, RsaUtils.getPrivateKey());
-                refreshToken = JWTUtils.generateRefreshToken(loginUser, RsaUtils.getPrivateKey());
-            }
+//            if (userLoginRequest.getSafeMode() == 1) {
+//                token = JWTUtils.generateToken(loginUser, privateKey, CommonUtils.getIpAddr(request));
+//                refreshToken = JWTUtils.generateRefreshToken(loginUser, privateKey, CommonUtils.getIpAddr(request));
+//            } else {
+//                token = JWTUtils.generateToken(loginUser, privateKey);
+//                refreshToken = JWTUtils.generateRefreshToken(loginUser, privateKey);
+//            }
             redisTemplate.opsForValue().set(token, refreshToken, TimeConstant.EXPIRATION_TIME_HOUR, TimeUnit.HOURS);
             log.info("[{}] \"{}\"{}",
                     BizCodeEnum.LOGIN_SUCCESS.getCode(),
@@ -235,9 +238,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     private void userRegisterInitTask(UserDO userDO) {
         NewUserCouponDTO newUserCouponDTO = NewUserCouponDTO.builder().userId(userDO.getId()).userName(userDO.getName()).build();
         JsonData jsonData = couponFeignService.intiNewUserCoupon(newUserCouponDTO);
-        if(jsonData.getCode() == 0){
+        if (jsonData.getCode() == 0) {
             log.info("[发放新用户注册优惠券成功] 用户：{}，结果：{}", newUserCouponDTO, jsonData);
-        }else {
+        } else {
             log.error("[发放新用户注册优惠券失败] 用户：{}，结果：{}", newUserCouponDTO, jsonData);
             // TODO 放入消息队列重新执行
 //            throw new RuntimeException(String.format("[发放新用户注册优惠券失败] 用户：%s，结果：%s", newUserCouponRequest, jsonData));

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,9 @@ public class NotifyServiceImpl implements NotifyService {
     private MailComponent mailComponent;
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     private static final String SUBJECT = "skyln1024商城验证码";
     private static final String CONTENT = "欢迎\"%s\"注册skyln1024商城，您的验证码是\"%s\"，有效期10分钟，请勿向他人透漏验证码。";
