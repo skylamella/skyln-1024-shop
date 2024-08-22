@@ -1,0 +1,127 @@
+version: '3.5'
+
+services:
+
+  skyln-api-gateway:
+    image: skyln-1024-shop/skyln-api-gateway:v1
+    container_name: skyln-api-gateway
+    build:
+      context: ./skyln-api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      TZ: Asia/Hong_Kong
+    privileged: true
+    networks:
+      skyln-net:
+        aliases:
+          - skyln-api-gateway
+
+  skyln-product-service:
+    image: skyln-1024-shop/skyln-product-service:v1
+    container_name: skyln-product-service
+    build:
+      context: ./skyln-product-service
+      dockerfile: Dockerfile
+    ports:
+      - "9001:9001"
+    environment:
+      TZ: Asia/Hong_Kong
+    privileged: true
+    networks:
+      skyln-net:
+        aliases:
+          - skyln-product-service
+
+  skyln-user-service:
+    image: skyln-1024-shop/skyln-user-service:v1
+    container_name: skyln-user-service
+    build:
+      context: ./skyln-user-service
+      dockerfile: Dockerfile
+    ports:
+      - "9002:9002"
+    environment:
+      TZ: Asia/Hong_Kong
+    privileged: true
+    networks:
+      skyln-net:
+        aliases:
+          - skyln-user-service
+
+  skyln-order-service:
+    image: skyln-1024-shop/skyln-order-service:v1
+    container_name: skyln-order-service
+    build:
+      context: ./skyln-order-service
+      dockerfile: Dockerfile
+    ports:
+      - "9003:9003"
+    environment:
+      TZ: Asia/Hong_Kong
+    privileged: true
+    networks:
+      skyln-net:
+        aliases:
+          - skyln-order-service
+
+  skyln-coupon-service:
+    image: skyln-1024-shop/skyln-coupon-service:v1
+    container_name: skyln-coupon-service
+    build:
+      context: ./skyln-coupon-service
+      dockerfile: Dockerfile
+    ports:
+      - "9004:9004"
+    environment:
+      TZ: Asia/Hong_Kong
+    privileged: true
+    networks:
+      skyln-net:
+        aliases:
+          - skyln-coupon-service
+
+  skyln-xxl-job:
+    image: skyln-1024-shop/skyln-xxl-job:v1
+    container_name: skyln-xxl-job-service
+    build:
+      context: ./skyln-xxl-job
+      dockerfile: Dockerfile
+    ports:
+      - "9910:9910"
+    environment:
+      TZ: Asia/Hong_Kong
+    privileged: true
+    networks:
+      skyln-net:
+        aliases:
+          - skyln-xxl-job-service
+
+  skyln-web-vue:
+    restart: always
+    image: nginx:1.22.1
+    container_name: skyln-web-vue-service
+    environment:
+      TZ: Asia/Hong_Kong
+    depends_on:
+      - igsl-cpc-bmc
+    ports:
+      - "80:80"
+    volumes:
+      # 配置文件映射
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      # 页面目录
+      - ./skyln-web-vue/admin/dist:/usr/share/nginx/html/admin
+      - ./skyln-web-vue/consumer/dist:/usr/share/nginx/html/consumer
+      - ./skyln-web-vue/merchant/dist:/usr/share/nginx/html/merchant
+      - ./logs:/var/log/nginx/
+    privileged: true
+    networks:
+      skyln-net:
+        aliases:
+          - skyln-web-vue-service
+
+networks:
+  skyln-net:
+    driver: bridge

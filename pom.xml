@@ -44,6 +44,7 @@
 
         <!--docker镜像打包变量-->
         <docker.image.prefix>skyln-cloud-shop</docker.image.prefix>
+        <docker.image.version>v1</docker.image.version>
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
     </properties>

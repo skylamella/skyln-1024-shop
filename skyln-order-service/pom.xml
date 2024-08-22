@@ -49,6 +49,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
                 <!--需要加这个，不然打包镜像找不到启动文件-->
                 <executions>
                     <execution>
@@ -68,6 +69,7 @@
                 <version>1.4.10</version>
                 <configuration>
                     <repository>${docker.image.prefix}/${project.artifactId}</repository>
+                    <tag>${docker.image.version}</tag>
                     <buildArgs>
                         <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>
